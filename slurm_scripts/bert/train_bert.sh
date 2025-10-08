@@ -9,8 +9,7 @@
 #SBATCH --output=%x-%j.out
 
 # Multi-GPU encoding
-source ~/.bashrc
-enter_conda
+module load anaconda3/2024.2
 conda activate crc
 
 mkdir -p ${HOME}/models/bert-msmarco-psg
@@ -19,7 +18,6 @@ model_dir=${HOME}/models/bert-msmarco-psg
 cd ${HOME}/refined-retrieval-context
 
 # Start experiments
-# a100 (1)
 CUDA_VISIBLE_DEVICES=0 python -m tevatron.retriever.driver.train \
     --output_dir ${model_dir} \
     --model_name_or_path bert-base-uncased \

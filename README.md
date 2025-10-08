@@ -7,8 +7,17 @@ We use the CRUX researchy training queries for training. We compare the differen
 
 ## Training Setups 
 
-| Method            | Dataset             | Training Steps | Batch Size | Negative Samples | Distillation  |
-| ------------------|---------------------|----------------|------------|------------------|-------------- |
-| Relevance-based   | MsMARCO             | 99k            | 256        | 0                | No            |
-| Coverage-based    | CRUX-Researchy      | 100k           | 256        | 10               | No            |
+- BERT-based-uncased
 
+| Method            | Dataset                      | Training Steps (eps) | Batch Size | Group Size      | Distillation  | GPU  |
+| ------------------|------------------------------|----------------      |------------|-----------------|-------------- |------|
+| Relevance-based   | Tevatron/msmarco-passage-aug | 450k (3)             | 32         | 8               | No            | 1    |
+| Coverage-based    | CRUX-Researchy               | 100k                 | 32         | 8               | No            | 1    |
+
+
+- Llama3 Lora
+
+| Method            | Dataset                      | Training Steps (eps) | Batch Size | Group Size      | Distillation  | GPU  |
+| ------------------|------------------------------|----------------      |------------|-----------------|-------------- |------|
+| Relevance-based   | Tevatron/msmarco-passage-aug | 3k                   | 40         | 16              | No            | 2    |
+| Coverage-based    | CRUX-Researchy               | 100k                 | 32         | 8               | No            | 2    |
