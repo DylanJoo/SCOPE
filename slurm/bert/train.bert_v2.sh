@@ -18,9 +18,6 @@ mkdir -p ${HOME}/models/bert-msmarco-psg
 
 cd ${HOME}/SCOPE
 
-# export CUDA_VISIBLE_DEVICES=0,1,2,3
-# export HIP_VISIBLE_DEVICES=0,1,2,3
-
 model_dir=${HOME}/models/bert-msmarco-psg.b8
 GPUS_PER_NODE=4
 NUM_NODES=1
