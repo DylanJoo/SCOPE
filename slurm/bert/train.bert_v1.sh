@@ -23,7 +23,7 @@ cd ${HOME}/SCOPE
 
 GPUS_PER_NODE=4
 NUM_NODES=1
-NUM_PROCESSES=$(expr $NNODES \* $GPUS_PER_NODE) # so processes know who to talk to
+NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE) # so processes know who to talk to
 
 # Start experimentss
 model_dir=${HOME}/models/bert-msmarco-psg.train-b16
