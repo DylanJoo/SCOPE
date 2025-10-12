@@ -13,7 +13,8 @@
 cd ${HOME}/SCOPE
 mkdir -p runs/msmarco-passage
 
-model_dir=${HOME}/models/bert-msmarco-psg.b8
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
+checkpoint=checkpoint-10000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 for split in dl19 dl20;do
@@ -32,5 +33,7 @@ for split in dl19 dl20;do
         --output runs/msmarco-passage/$split.trec
 done
 
-python -m ir_measures msmarco-passage/trec-dl-2019 runs/msmarco-passage/dl19.trec nDCG@10
-python -m ir_measures msmarco-passage/trec-dl-2020 runs/msmarco-passage/dl20.trec nDCG@10
+singularity exec $SIF \
+    python -m ir_measures msmarco-passage/trec-dl-2019 runs/msmarco-passage/dl19.trec nDCG@10
+singularity exec $SIF \
+    python -m ir_measures msmarco-passage/trec-dl-2020 runs/msmarco-passage/dl20.trec nDCG@10

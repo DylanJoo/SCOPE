@@ -16,15 +16,15 @@ module use /appl/local/training/modules/AI-20241126/
 
 cd ${HOME}/SCOPE
 
-## A100x1: msmarco-passage-aug b32 n8 3ep
+## A100x1: msmarco-passage-aug b32 n256 3ep
 #dl19/20: 0.6447 0.6567
 # model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
 # checkpoint=checkpoint-46032
 
 ## AMD*4: 
 #dl19/20: 
-model_dir=${HOME}/models/bert-msmarco-psg.b8
-checkpoint=checkpoint-20000
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
+checkpoint=checkpoint-10000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 

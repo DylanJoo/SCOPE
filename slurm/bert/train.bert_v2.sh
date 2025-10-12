@@ -14,11 +14,11 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-mkdir -p ${HOME}/models/bert-msmarco-psg.b32_n256
+mkdir -p ${HOME}/models/bert-msmarco-psg.b128_n256
 
 cd ${HOME}/SCOPE
 
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
 GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
@@ -39,7 +39,7 @@ singularity exec $SIF \
     --per_device_train_batch_size 8 \
     --train_group_size 8 \
     --dataloader_num_workers 1 \
-    --learning_rate 1e-5 \
+    --learning_rate 1e-4 \
     --query_max_len 32 \
     --passage_max_len 256 \
     --max_steps 100000 \
@@ -47,4 +47,5 @@ singularity exec $SIF \
     --attn_implementation sdpa \
     --overwrite_output_dir \
     --warmup_steps 5000 \
-    --run_name bert-base.msmarco-passage.b32_n256.5k_100k
+    --gradient_accumulation_steps 4 \
+    --run_name bert-base.msmarco-passage.b128_n256.1e-4.5k_100k

@@ -43,7 +43,8 @@ singularity exec $SIF \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
     --query_prefix "query: " \
     --passage_prefix "passage: " \
-    --bf16 --dtype bfloat16 \
+    --bf16 \
+    --dtype bfloat16 \
     --pooling eos \
     --append_eos_token \
     --normalize \

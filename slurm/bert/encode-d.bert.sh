@@ -16,15 +16,15 @@ module use /appl/local/training/modules/AI-20241126/
 
 cd ${HOME}/SCOPE
 
-## A100x1: msmarco-passage-aug b32 n8 3ep
+## A100x1: msmarco-passage-aug b32 n8 3ep 24hr
 #dl19/20: 0.6447 0.6567
 # model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
 # checkpoint=checkpoint-46032
 
 ## AMD*4: 
 #dl19/20: 
-model_dir=${HOME}/models/bert-msmarco-psg.b8
-checkpoint=checkpoint-20000
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
+checkpoint=checkpoint-10000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
@@ -34,7 +34,7 @@ for device in {0..7};do
     SHARD=$device
     export CUDA_VISIBLE_DEVICES=$device
     export HIP_VISIBLE_DEVICES=$device
-    singularity exec $SIF \
+    singularity exec $SIF  \
     python -m tevatron.retriever.driver.encode \
       --output_dir=temp \
       --tokenizer_name bert-base-uncased \
