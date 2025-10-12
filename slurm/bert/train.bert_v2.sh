@@ -8,17 +8,17 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
 #SBATCH --mem=120G
-#SBATCH --time=3-00:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=0-10:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-mkdir -p ${HOME}/models/bert-msmarco-psg
+mkdir -p ${HOME}/models/bert-msmarco-psg.b32_n256
 
 cd ${HOME}/SCOPE
 
-model_dir=${HOME}/models/bert-msmarco-psg.b8
+model_dir=${HOME}/models/bert-msmarco-psg.b32_n256
 GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
@@ -31,19 +31,20 @@ singularity exec $SIF \
     tevatron.retriever.driver.train \
     --output_dir ${model_dir} \
     --model_name_or_path bert-base-uncased \
-    --bf16 --dtype bfloat16 \
+    --bf16 \
+    --dtype bfloat16 \
     --save_steps 10000 \
     --dataset_name Tevatron/msmarco-passage-new \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
     --per_device_train_batch_size 8 \
     --train_group_size 8 \
     --dataloader_num_workers 1 \
-    --learning_rate 2e-5 \
+    --learning_rate 1e-5 \
     --query_max_len 32 \
     --passage_max_len 256 \
     --max_steps 100000 \
-    --gradient_accumulation_steps 4 \
-    --logging_steps 100 \
+    --logging_steps 10 \
     --attn_implementation sdpa \
     --overwrite_output_dir \
-    --run_name bert-base.msmarco-passage.4gpu-b8-acc4.n8-30eps
+    --warmup_steps 5000 \
+    --run_name bert-base.msmarco-passage.b32_n256.5k_100k

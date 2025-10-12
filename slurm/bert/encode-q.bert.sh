@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=encode
-#SBATCH --output=logs/bert-ms-enc.out.%j
-#SBATCH --error=logs/bert-ms-enc.err.%j
+#SBATCH --output=enc-query.out
+#SBATCH --error=enc-query.err
 #SBATCH --partition=dev-g           # partition name
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
@@ -16,8 +16,15 @@ module use /appl/local/training/modules/AI-20241126/
 
 cd ${HOME}/SCOPE
 
-model_dir=${HOME}/models/bert-msmarco-psg.train-b8
-checkpoint=checkpoint-10000
+## A100x1: msmarco-passage-aug b32 n8 3ep
+#dl19/20: 0.6447 0.6567
+# model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
+# checkpoint=checkpoint-46032
+
+## AMD*4: 
+#dl19/20: 
+model_dir=${HOME}/models/bert-msmarco-psg.b8
+checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 

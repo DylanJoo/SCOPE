@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=search
-#SBATCH --output=logs/search.o
-#SBATCH --error=logs/search.e
+#SBATCH --output=search.o
+#SBATCH --error=search.e
 #SBATCH --partition=debug           # partition name
 #SBATCH --ntasks-per-node=1       # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                 # Total number of nodes 
@@ -10,12 +10,10 @@
 #SBATCH --time=0-00:30:00         # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
 
-# module use /appl/local/csc/modulefiles/
-# module use /appl/local/training/modules/AI-20241126/
-
 cd ${HOME}/SCOPE
+mkdir -p runs/msmarco-passage
 
-model_dir=${HOME}/models/bert-msmarco-psg.train-b8
+model_dir=${HOME}/models/bert-msmarco-psg.b8
 output_dir=${HOME}/indices/${model_dir##*/}
 
 for split in dl19 dl20;do
@@ -23,7 +21,7 @@ for split in dl19 dl20;do
     python -m tevatron.retriever.driver.search \
 	--query_reps $output_dir/$split.query_emb.pkl \
 	--passage_reps $output_dir/'corpus_emb.*.pkl' \
-	--depth 200 \
+	--depth 100 \
 	--batch_size -1 \
 	--save_text \
 	--save_ranking_to $output_dir/$split.run
@@ -34,3 +32,5 @@ for split in dl19 dl20;do
         --output runs/msmarco-passage/$split.trec
 done
 
+python -m ir_measures msmarco-passage/trec-dl-2019 runs/msmarco-passage/dl19.trec nDCG@10
+python -m ir_measures msmarco-passage/trec-dl-2020 runs/msmarco-passage/dl20.trec nDCG@10

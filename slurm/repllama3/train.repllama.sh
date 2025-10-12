@@ -54,7 +54,7 @@ singularity exec $SIF \
     --query_max_len 32 \
     --passage_max_len 196 \
     --num_train_epochs 1 \
-    --logging_steps 5 \
+    --logging_steps 10 \
     --overwrite_output_dir \
     --gradient_accumulation_steps 4 \
     --gradient_checkpointing \
