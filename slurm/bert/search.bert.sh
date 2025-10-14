@@ -13,8 +13,8 @@
 cd ${HOME}/SCOPE
 mkdir -p runs/msmarco-passage
 
-model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
-checkpoint=checkpoint-10000
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256
+checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 for split in dl19 dl20;do

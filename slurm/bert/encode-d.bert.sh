@@ -23,8 +23,8 @@ cd ${HOME}/SCOPE
 
 ## AMD*4: 
 #dl19/20: 
-model_dir=${HOME}/models/bert-msmarco-psg.b128_n256-1e-4
-checkpoint=checkpoint-10000
+model_dir=${HOME}/models/bert-msmarco-psg.b128_n256
+checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
@@ -39,7 +39,8 @@ for device in {0..7};do
       --output_dir=temp \
       --tokenizer_name bert-base-uncased \
       --model_name_or_path $model_dir/$checkpoint \
-      --bf16 --dtype bfloat16 \
+      --bf16 \
+      --dtype bfloat16 \
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --dataset_name Tevatron/msmarco-passage-corpus-new \
