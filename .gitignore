@@ -1,9 +1,7 @@
 wandb/
 *out
 
-slurm/
-!slurm/bert/*
-!slurm/repllama/*
+slurm/qwen3
 core
 
 runs
