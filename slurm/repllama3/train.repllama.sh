@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
-#SBATCH --gpus-per-node=8           # Allocate one gpu per MPI rank
+#SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
 #SBATCH --mem=120G
 #SBATCH --time=3-00:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
@@ -18,8 +18,8 @@ mkdir -p ${HOME}/models/repllama-msmarco-psg
 
 cd ${HOME}/SCOPE
 
-model_dir=${HOME}/models/llama-msmarco-psg.b8
-GPUS_PER_NODE=8
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512
+GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
 
@@ -44,13 +44,12 @@ singularity exec $SIF \
     --query_prefix "query: " \
     --passage_prefix "passage: " \
     --bf16 \
-    --dtype bfloat16 \
     --pooling eos \
     --append_eos_token \
     --normalize \
     --temperature 0.01 \
-    --per_device_train_batch_size 4 \
-    --train_group_size 8 \
+    --per_device_train_batch_size 8 \
+    --train_group_size 16 \
     --learning_rate 1e-4 \
     --query_max_len 32 \
     --passage_max_len 196 \
@@ -59,4 +58,4 @@ singularity exec $SIF \
     --overwrite_output_dir \
     --gradient_accumulation_steps 4 \
     --gradient_checkpointing \
-    --run_name repllama3-lora.msmarco-passage.b32-n8-1ep
+    --run_name repllama3-lora.msmarco-passage.b128_n512

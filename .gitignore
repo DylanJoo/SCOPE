@@ -1,4 +1,9 @@
 wandb/
 *out
 
-slurm/logs
+slurm/
+!slurm/bert/*
+!slurm/repllama/*
+core
+
+runs

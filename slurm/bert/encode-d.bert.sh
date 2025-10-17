@@ -17,14 +17,12 @@ module use /appl/local/training/modules/AI-20241126/
 cd ${HOME}/SCOPE
 
 ## A100x1: msmarco-passage-aug b32 n8 3ep 24hr
-#dl19/20: 0.6447 0.6567
 # model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
 # checkpoint=checkpoint-46032
 
-## AMD*4: 
-#dl19/20: 
-model_dir=${HOME}/models/bert-msmarco-psg.b128_n256
-checkpoint=checkpoint-20000
+## AMD*2
+model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.bf16
+checkpoint=checkpoint-45000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
@@ -40,7 +38,6 @@ for device in {0..7};do
       --tokenizer_name bert-base-uncased \
       --model_name_or_path $model_dir/$checkpoint \
       --bf16 \
-      --dtype bfloat16 \
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --dataset_name Tevatron/msmarco-passage-corpus-new \
