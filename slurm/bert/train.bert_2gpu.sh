@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/bert-ms.out.%j
-#SBATCH --error=logs/bert-ms.err.%j
+#SBATCH --output=logs/2gpu.%j.out
+#SBATCH --error=logs/2gpu.%j.err
 #SBATCH --partition=small-g         # partition name
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
@@ -14,17 +14,18 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-mkdir -p ${HOME}/models/bert-msmarco-psg.b32_n256
-
-cd ${HOME}/SCOPE
-
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256
+bsz=32
+nsample=256
+model_dir=${HOME}/models/bert-msmarco-psg.b${bsz}_n${nsample}.2gpu
 GPUS_PER_NODE=2
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
+lr=1e-5
+
+mkdir -p ${model_dir}
 
 # Start experimentss
-singularity exec $SIF \
+srun singularity exec $SIF \
     accelerate launch -m \
     --multi_gpu \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
@@ -35,14 +36,22 @@ singularity exec $SIF \
     --dataset_name Tevatron/msmarco-passage-new \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
     --per_device_train_batch_size 16 \
+    --prediction_loss_only True \
+    --eval_strategy steps \
+    --do_eval True \
+    --eval_dataset_name DylanJHJ/Qrels \
+    --eval_dataset_split msmarco_passage.trec_dl_2019 \
+    --eval_group_size 8 \
+    --per_device_eval_batch_size 64 \
+    --eval_steps 100 \
     --train_group_size 8 \
     --dataloader_num_workers 1 \
-    --learning_rate 1e-5 \
+    --learning_rate $lr \
     --query_max_len 32 \
-    --passage_max_len 256 \
+    --passage_max_len 196 \
     --max_steps 50000 \
     --logging_steps 10 \
     --attn_implementation sdpa \
     --overwrite_output_dir \
     --warmup_steps 5000 \
-    --run_name bert-base.msmarco-passage.b32_n256.1e-5.5k_50k
+    --run_name bert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}

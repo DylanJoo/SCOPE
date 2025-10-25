@@ -18,13 +18,13 @@ cd ${HOME}/SCOPE
 
 ## A100x1: msmarco-passage-aug b32 n256 3ep
 # model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
-# checkpoint=checkpoint-46032
 
 ## AMD*2:
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256
-checkpoint=checkpoint-45000
+model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.2gpu
+checkpoint=checkpoint-50000
 output_dir=${HOME}/indices/${model_dir##*/}
 
+mkdir -p $output_dir
 
 echo start running
 for split in dl19 dl20;do

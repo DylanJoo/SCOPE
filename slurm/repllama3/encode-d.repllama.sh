@@ -22,10 +22,13 @@ checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
 ## AMD*4: 
 # dl19/20: 
-model_dir=${HOME}/models/llama-msmarco-psg.b8
-checkpoint=checkpoint-3836
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512
+checkpoint=checkpoint-2000
 
-OUTPUT_DIR=${HOME}/indices/${model_dir##*/}
+output_dir=${HOME}/indices/${model_dir##*/}
+
+mkdir -p $output_dir
+
 NODELIST=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 TOTAL_SHARDS=64 # total shards (64 shards = 8 nodes * 8 GPUs)
 SHARDS_PER_NODE=$(( TOTAL_SHARDS / SLURM_NNODES ))
@@ -64,7 +67,7 @@ for node in $NODELIST; do
           --dataset_number_of_shards $TOTAL_SHARDS \
           --dataset_name Tevatron/msmarco-passage-corpus-new \
           --corpus_name Tevatron/msmarco-passage-corpus-new \
-          --encode_output_path $OUTPUT_DIR/corpus_emb.\${SHARD}.pkl \
+          --encode_output_path $output_dir/corpus_emb.\${SHARD}.pkl \
           --dataset_shard_index \${SHARD} & 
     done
     wait

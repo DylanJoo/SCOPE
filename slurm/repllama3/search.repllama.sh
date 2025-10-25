@@ -2,54 +2,26 @@
 #SBATCH --job-name=search
 #SBATCH --output=search.o
 #SBATCH --error=search.e
-#SBATCH --partition=debug           # partition name
+#SBATCH --partition=small           # partition name
 #SBATCH --ntasks-per-node=1       # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                 # Total number of nodes 
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=120G
+#SBATCH --mem=256G
 #SBATCH --time=0-00:30:00         # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
 
 cd ${HOME}/SCOPE
 mkdir -p runs/msmarco-passage
 
-# dl19/20:
-# model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
-# A100 46K: 0.6567/0.6447
+# dl19: 0.7350; dl20: 0.7232
+model_dir=DylanJHJ
+checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.100k.nv
-# A100 45K: 0.6210/0.6001
-# A100 50K: 0.6233/0.6005
-
-# model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.100k
-# AMD  20K: 0.5833/0.6074
-# AMD  30K: 0.6246/0.6057
-# AMD  40K: 0.6184/0.6108
-# AMD  50K: 0.6112/0.6106
-
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.1gpu
-# AMD  15K: 0.6083/0.6184 (1gpu)
-# AMD  30K: 0.6206/0.6164(1gpu)
-# AMD  40K: 0.6133/0.6104
-# AMD  45K: 0.6193/0.6170
-# AMD  50K: 0.6178/0.6193
-
-model_dir=${HOME}/models/bert-msmarco-psg.b64_n512.2gpu
-# AMD  15K: 0.6345/0.6115 (2gpu)
-# AMD  30K: 0.6280/0.6117
-# AMD  35K: 0.6031/0.5972
-# AMD  40K: 0.6186/0.5927
-# AMD  50K: 0.6280/0.6117
-
-# model_dir=${HOME}/models/bert-msmarco-psg.b64_n512.100k
-# AMD  25K: 0.6375/0.6085
-# AMD  50K: 0.6255/0.5900
-# AMD  55K: 0.6066/0.5999
-# AMD  85K: 0.6233/0.6005
+model_dir=${HOME}/models/llama-msmarco-psg.b8
+checkpoint=checkpoint-3836
 
 output_dir=${HOME}/indices/${model_dir##*/}
 
-echo model: $model_dir, checkpoint: $checkpoint
 for split in dl19 dl20;do
     singularity exec $SIF \
     python -m tevatron.retriever.driver.search \
