@@ -17,9 +17,8 @@ mkdir -p runs/msmarco-passage
 # model_dir=DylanJHJ
 # checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
-model_dir=${HOME}/models/llama-msmarco-psg.b8
-checkpoint=checkpoint-3836
-
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
+checkpoint=checkpoint-3000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 for split in dl19 dl20;do
@@ -35,10 +34,10 @@ for split in dl19 dl20;do
     singularity exec $SIF \
     python -m tevatron.utils.format.convert_result_to_trec \
         --input $output_dir/$split.run \
-        --output runs/msmarco-passage/$split.trec
+        --output $output_dir/$split.trec
 done
 
 singularity exec $SIF \
-    python -m ir_measures msmarco-passage/trec-dl-2019 runs/msmarco-passage/dl19.trec nDCG@10
+    python -m ir_measures msmarco-passage/trec-dl-2019 $output_dir/dl19.trec nDCG@10
 singularity exec $SIF \
-    python -m ir_measures msmarco-passage/trec-dl-2020 runs/msmarco-passage/dl20.trec nDCG@10
+    python -m ir_measures msmarco-passage/trec-dl-2020 $output_dir/dl20.trec nDCG@10

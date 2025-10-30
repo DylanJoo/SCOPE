@@ -27,9 +27,10 @@ output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
 
-EXCLUDE_TITLE=true
+EXCLUDE_TITLE="--exclude_title "
 if [[ $model_dir == *"title"* ]]; then
-    EXCLUDE_TITLE=false
+    EXCLUDE_TITLE=""
+    echo 'Title is included.'
 fi
 
 # Start experimentss
@@ -45,7 +46,7 @@ for device in {0..7};do
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --bf16 \
-      ${EXCLUDE_TITLE:+--exclude_title} \
+      ${EXCLUDE_TITLE} \
       --dataset_name Tevatron/msmarco-passage-corpus-new \
       --corpus_name Tevatron/msmarco-passage-corpus-new \
       --encode_output_path $output_dir/corpus_emb.${SHARD}.pkl \

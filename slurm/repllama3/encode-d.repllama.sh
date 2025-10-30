@@ -32,9 +32,10 @@ NODELIST=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 TOTAL_SHARDS=64 # total shards (64 shards = 8 nodes * 8 GPUs)
 SHARDS_PER_NODE=$(( TOTAL_SHARDS / SLURM_NNODES ))
 
-EXCLUDE_TITLE=true
+EXCLUDE_TITLE="--exclude_title "
 if [[ $model_dir == *"title"* ]]; then
-    EXCLUDE_TITLE=false
+    EXCLUDE_TITLE=""
+    echo 'Title is included.'
 fi
 
 i=0
@@ -62,7 +63,7 @@ for node in $NODELIST; do
           --lora_name_or_path $model_dir/$checkpoint \
           --lora \
           --bf16 \
-          ${EXCLUDE_TITLE:+--exclude_title} \
+          ${EXCLUDE_TITLE} \
           --per_device_eval_batch_size 200 \
           --normalize \
           --pooling last \
@@ -70,7 +71,7 @@ for node in $NODELIST; do
           --append_eos_token \
           --passage_max_len 256 \
           --dataset_number_of_shards $TOTAL_SHARDS \
-          --corpus_name Tevatron/msmarco-passage-corpus-new \
+          --dataset_name Tevatron/msmarco-passage-corpus-new \
           --encode_output_path $OUTPUT_DIR/corpus_emb.\${SHARD}.pkl \
           --dataset_shard_index \${SHARD} & 
     done
