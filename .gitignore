@@ -1,7 +1,11 @@
 wandb/
 *out
+*err
+**/*out
+**/*err
 
 slurm/qwen3
+slurm/search*
 core
 
 runs

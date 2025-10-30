@@ -23,8 +23,8 @@ checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
 ## AMD*4: 
 # dl19/20: 
-model_dir=${HOME}/models/llama-msmarco-psg.b8
-checkpoint=checkpoint-3836
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
+checkpoint=checkpoint-3000
 
 output_dir=${HOME}/indices/${model_dir##*/}
 

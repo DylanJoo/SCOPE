@@ -14,8 +14,8 @@ cd ${HOME}/SCOPE
 mkdir -p runs/msmarco-passage
 
 # dl19: 0.7350; dl20: 0.7232
-model_dir=DylanJHJ
-checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
+# model_dir=DylanJHJ
+# checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
 model_dir=${HOME}/models/llama-msmarco-psg.b8
 checkpoint=checkpoint-3836

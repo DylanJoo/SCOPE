@@ -17,21 +17,25 @@ module use /appl/local/training/modules/AI-20241126/
 
 cd $HOME/SCOPE
 
-model_dir=DylanJHJ
-checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
+# model_dir=DylanJHJ
+# checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
 
 ## AMD*4: 
 # dl19/20: 
-model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512
-checkpoint=checkpoint-2000
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
+checkpoint=checkpoint-3000
 
-output_dir=${HOME}/indices/${model_dir##*/}
-
-mkdir -p $output_dir
+OUTPUT_DIR=${HOME}/indices/${model_dir##*/}
+mkdir -p $OUTPUT_DIR
 
 NODELIST=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 TOTAL_SHARDS=64 # total shards (64 shards = 8 nodes * 8 GPUs)
 SHARDS_PER_NODE=$(( TOTAL_SHARDS / SLURM_NNODES ))
+
+EXCLUDE_TITLE=true
+if [[ $model_dir == *"title"* ]]; then
+    EXCLUDE_TITLE=false
+fi
 
 i=0
 for node in $NODELIST; do
@@ -58,6 +62,7 @@ for node in $NODELIST; do
           --lora_name_or_path $model_dir/$checkpoint \
           --lora \
           --bf16 \
+          ${EXCLUDE_TITLE:+--exclude_title} \
           --per_device_eval_batch_size 200 \
           --normalize \
           --pooling last \
@@ -65,15 +70,14 @@ for node in $NODELIST; do
           --append_eos_token \
           --passage_max_len 256 \
           --dataset_number_of_shards $TOTAL_SHARDS \
-          --dataset_name Tevatron/msmarco-passage-corpus-new \
           --corpus_name Tevatron/msmarco-passage-corpus-new \
-          --encode_output_path $output_dir/corpus_emb.\${SHARD}.pkl \
+          --encode_output_path $OUTPUT_DIR/corpus_emb.\${SHARD}.pkl \
           --dataset_shard_index \${SHARD} & 
     done
     wait
   " &
+  ((i++))
 done
 
 wait
 echo "Done"
-
