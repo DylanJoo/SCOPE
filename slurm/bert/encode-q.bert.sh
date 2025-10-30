@@ -17,17 +17,18 @@ module use /appl/local/training/modules/AI-20241126/
 cd ${HOME}/SCOPE
 
 ## A100x1: msmarco-passage-aug b32 n256 3ep
-# model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
+# model_dir=${HOME}/models/dpr-bert-base-uncased.b32_n256.msmarco-passage.3ep
+# checkpoint=checkpoint-45000
 
 ## AMD*2:
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.2gpu
-checkpoint=checkpoint-50000
+model_dir=${HOME}/models/bert-msmarco-psg.b64_n512.1e-5
+checkpoint=checkpoint-25000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
 
 echo start running
-for split in dl19 dl20;do
+for split in dl19 dl20 dev;do
     export CUDA_VISIBLE_DEVICES=0
     export HIP_VISIBLE_DEVICES=0
     singularity exec $SIF \
@@ -38,7 +39,6 @@ for split in dl19 dl20;do
       --bf16 \
       --per_device_eval_batch_size 1024 \
       --dataset_name Tevatron/msmarco-passage-new \
-      --corpus_name Tevatron/msmarco-passage-new \
       --dataset_split $split \
       --attn_implementation sdpa \
       --encode_output_path $output_dir/$split.query_emb.pkl \

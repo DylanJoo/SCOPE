@@ -17,16 +17,20 @@ module use /appl/local/training/modules/AI-20241126/
 cd ${HOME}/SCOPE
 
 ## A100x1: msmarco-passage-aug b32 n8 3ep 24hr
-# model_dir=${HOME}/models/bert-msmarco-psg-aug.b32_n256
+# model_dir=${HOME}/models/dpr-bert-base-uncased.b32_n256.msmarco-passage.3ep
+# checkpoint=checkpoint-45000
 
 ## AMD*2
-model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.2gpu
-checkpoint=checkpoint-50000
-# model_dir=${HOME}/models/bert-msmarco-psg.b32_n256.2gpu
-# checkpoint=checkpoint-45000
+model_dir=${HOME}/models/bert-msmarco-psg.b64_n512.1e-5
+checkpoint=checkpoint-25000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
+
+EXCLUDE_TITLE=true
+if [[ $model_dir == *"title"* ]]; then
+    EXCLUDE_TITLE=false
+fi
 
 # Start experimentss
 for device in {0..7};do
@@ -41,6 +45,7 @@ for device in {0..7};do
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --bf16 \
+      ${EXCLUDE_TITLE:+--exclude_title} \
       --dataset_name Tevatron/msmarco-passage-corpus-new \
       --corpus_name Tevatron/msmarco-passage-corpus-new \
       --encode_output_path $output_dir/corpus_emb.${SHARD}.pkl \

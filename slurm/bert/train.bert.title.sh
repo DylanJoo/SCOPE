@@ -14,20 +14,21 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-bsz=32
-nsample=256
-model_dir=${HOME}/models/bert-msmarco-psg.b${bsz}_n${nsample}.bf16
-GPUS_PER_NODE=2
-NUM_NODES=1
-NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
-lr=2e-5
+bsz=64
+nsample=512
+lr=1e-5
+model_dir=${HOME}/models/bert-msmarco-psg.b${bsz}_n${nsample}.${lr}.title
 
 mkdir -p ${model_dir}
 
-# Start experimentss
+GPUS_PER_NODE=2
+NUM_NODES=1
+NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
+
+# Start experiments
 srun singularity exec $SIF \
     accelerate launch -m \
-    --multi_gpu --mixed_precision=bf16 \
+    --multi_gpu \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
     --output_dir ${model_dir} \
@@ -35,9 +36,9 @@ srun singularity exec $SIF \
     --save_steps 5000 \
     --dataset_name Tevatron/msmarco-passage-new \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
-    --per_device_train_batch_size 16 \
+    --per_device_train_batch_size 32 \
+    --train_group_size 8 \
     --prediction_loss_only True \
-    --bf16 True \
     --eval_strategy steps \
     --do_eval True \
     --eval_dataset_name DylanJHJ/Qrels \
@@ -45,14 +46,13 @@ srun singularity exec $SIF \
     --eval_group_size 8 \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
-    --train_group_size 8 \
-    --dataloader_num_workers 1 \
     --learning_rate $lr \
     --query_max_len 32 \
     --passage_max_len 196 \
-    --max_steps 50000 \
+    --dataloader_num_workers 2 \
+    --max_steps 25000 \
+    --warmup_steps 2500 \
     --logging_steps 10 \
     --attn_implementation sdpa \
     --overwrite_output_dir \
-    --warmup_steps 5000 \
-    --run_name bert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.bf16
+    --run_name bert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.title
