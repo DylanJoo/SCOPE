@@ -60,14 +60,18 @@ for split in ['msmarco_passage.dev.small']:
     for qid in qrel:
         # relevances = [relevance for docid, relevance in qrel[qid].items()]
 
-        dataset_dict[split].append({
-            'query_id': qid, 
-            'query_text': query[str(qid)],
-            'positive_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance > 0],
-            'negative_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance == 0],
-            'answer': None,
-            'source': 'msmarco-passage'
-        })
+        negative_document_ids = [docid for docid, relevance in qrel[qid].items() if relevance == 0]
+        positive_document_ids = [docid for docid, relevance in qrel[qid].items() if relevance > 0]
+
+        if len(negative_document_ids) > 0 and len(positive_document_ids) > 0:
+            dataset_dict[split].append({
+                'query_id': qid, 
+                'query_text': query[str(qid)],
+                'positive_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance > 0],
+                'negative_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance == 0],
+                'answer': None,
+                'source': 'msmarco-passage'
+            })
 
 ## Transform to dataset
 qrel_dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
