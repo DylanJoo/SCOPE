@@ -14,11 +14,10 @@ cd ${HOME}/SCOPE
 mkdir -p runs/msmarco-passage
 
 # dl19: 0.7350; dl20: 0.7232
-# model_dir=DylanJHJ
-# checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
-
-model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
-checkpoint=checkpoint-3000
+# dl19: 0.7540; dl20: 0.7277 (ckpt=3000, wo title)
+# dl19: 0.7426; dl20: 0.7354 (ckpt=4000, wo title)
+# dl19:       ; dl20:        (ckpt=4000, w title)
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4.title
 output_dir=${HOME}/indices/${model_dir##*/}
 
 for split in dl19 dl20;do

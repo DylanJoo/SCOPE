@@ -22,8 +22,8 @@ cd $HOME/SCOPE
 
 ## AMD*4: 
 # dl19/20: 
-model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
-checkpoint=checkpoint-3000
+model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4.title
+checkpoint=checkpoint-4000 # trying the last checkpoint
 
 OUTPUT_DIR=${HOME}/indices/${model_dir##*/}
 mkdir -p $OUTPUT_DIR
