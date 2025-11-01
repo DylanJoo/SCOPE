@@ -14,23 +14,25 @@
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate pyserini
 
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage-titled.25k
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
-output_dir=${HOME}/indices/${model_dir##*/}
-
+model_dir=Qwen/Qwen3-Embedding-0.6B
+output_dir=${HOME}/indices/crux-researchy-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
-for split in dl19 dl20 dev;do
-    python -m tevatron.retriever.driver.encode \
-      --output_dir=temp \
-      --tokenizer_name bert-base-uncased \
-      --model_name_or_path $model_dir \
-      --bf16 \
-      --per_device_eval_batch_size 1024 \
-      --dataset_name Tevatron/msmarco-passage-new \
-      --dataset_split $split \
-      --attn_implementation sdpa \
-      --encode_output_path $output_dir/$split.query_emb.pkl \
-      --query_max_len 32 \
-      --encode_is_query
-done
+# Original queqry
+python -m tevatron.retriever.driver.encode \
+  --output_dir=temp \
+  --tokenizer_name bert-base-uncased \
+  --model_name_or_path $model_dir \
+  --bf16 \
+  --per_device_eval_batch_size 16 \
+  --normalize \
+  --pooling last \
+  --padding_side left \
+  --query_prefix "Instruct: Given a web search query, retrieve relevant passages that provide context to the query.\nQuery:" \
+  --append_eos_token \
+  --query_max_len 64 \
+  --dataset_name DylanJHJ/crux-researchy \
+  --dataset_split train \
+  --encode_output_path $output_dir/query_emb.train.pkl \
+  --encode_is_query
+  # --query_prefix "Instruct: Given a report request, retrieve relevant passages that provide context to the report.\nQuery:" \

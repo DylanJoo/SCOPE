@@ -1,8 +1,10 @@
 wandb/
 *out
+*swp
 *err
 **/**out*
 **/**err*
+**/**.swp
 
 slurm/qwen3
 slurm/search*
