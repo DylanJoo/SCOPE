@@ -17,14 +17,17 @@ subtopics = load_subtopics(split)
 run = load_run_or_qrel(f'/exp/scale25/artifacts/crux/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings('/exp/scale25/artifacts/crux/crux-researchy/judge/')
 
+count = 0
 report = {}
-
 for qid in run:
 
     # stat1: answerable 
     n = len(subtopics[qid])
     n_ans = (np.max([judge[qid][docid] for docid in judge[qid]], 0) >= tau).sum()
     n_unans = n - n_ans
+
+    if n_unans == 0:
+        count += 1
 
     # stat2
     document_ids = {0.75: [], 0.5: [], 0.25: [], 0.0: [], -1: []}
@@ -44,28 +47,30 @@ for qid in run:
         coverage_accumulated.append(float(c_acc))
 
         for threshold in [0.75, 0.5, 0.25, 0.0]:
-            if c == 0: # we consider the document with zero coverage as negative
-                document_ids[-1].append(docid)
-
             if c >= threshold:
                 document_ids[threshold].append(docid)
+                if c == 0:
+                    document_ids[-1].append(docid)
                 break
 
     report[qid] = {
         'n_subtopics': n,
         'n_answerable': int(n_ans),
         'n_unanswerable': int(n_unans),
+        'r_answerable': float(n_ans/n),
+        'r_unanswerable': float(n_unans/n),
         'coverage_per_doc': coverage_per_doc,
         'coverage': coverage_accumulated,
         'high_coverage_document_ids': document_ids[0.75],
         'half_coverage_document_ids': document_ids[0.5],
+        'quarter_coverage_document_ids': document_ids[0.25],
         'low_coverage_document_ids': document_ids[0.0],
         'negative_document_ids': document_ids[-1],
     }
 
 
 # Print and report the average
-print('Total topics:', len(report))
+print('Total topics:', len(report), '\nTotal fully answerable topics', count)
 for key in ['n_subtopics', 'n_answerable', 'n_unanswerable']:
     values = [report[qid][key] for qid in report]
     avg_value = sum(values) / len(values)
@@ -77,7 +82,7 @@ for key in ['coverage_per_doc', 'coverage']:
         avg_value = sum(values) / len(values)
         print(f'Average {key} at rank {rank+1}: {avg_value}')
 
-for key in ['half_coverage_document_ids', 'low_coverage_document_ids', 'high_coverage_document_ids']:
+for key in ['high_coverage_document_ids', 'half_coverage_document_ids', 'low_coverage_document_ids', 'quarter_coverage_document_ids', 'negative_document_ids']:
     values = [len(report[qid][key]) for qid in report]
     avg_value = sum(values) / len(values)
     print(f'Average {key}: {avg_value}')

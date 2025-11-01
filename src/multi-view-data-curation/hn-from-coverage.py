@@ -1,5 +1,7 @@
+from tqdm import tqdm 
 import argparse
 import numpy as np
+from datasets import DatasetDict, Dataset
 from crux.tools import load_ratings, load_run_or_qrel
 from crux.tools.researchy.ir_utils import load_topic, load_subtopics
 
@@ -17,9 +19,8 @@ subtopics = load_subtopics(split)
 run = load_run_or_qrel(f'/exp/scale25/artifacts/crux/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings('/exp/scale25/artifacts/crux/crux-researchy/judge/')
 
-report = {}
-
-for qid in run:
+dataset_dict = {}
+for qid in tqdm(run):
 
     # stat1: answerable 
     n = len(subtopics[qid])
@@ -27,7 +28,7 @@ for qid in run:
     n_unans = n - n_ans
 
     # stat2
-    document_ids = {0.75: [], 0.5: [], 0.25: [], 0.0: []}
+    document_ids = {0.75: [], 0.5: [], 0.25: [], 0.0: [], -1: []}
     coverage_per_doc = []
     coverage_accumulated = []
     for i, docid in enumerate(run[qid]):
@@ -44,38 +45,51 @@ for qid in run:
         coverage_accumulated.append(float(c_acc))
 
         for threshold in [0.75, 0.5, 0.25, 0.0]:
-            if c == 0: # we consider the document with zero coverage as negative
-                document_ids[-1].append(docid)
-
             if c >= threshold:
                 document_ids[threshold].append(docid)
+                if c == 0:
+                    document_ids[-1].append(docid)
                 break
 
-    report[qid] = {
-        'n_subtopics': n,
-        'n_answerable': int(n_ans),
-        'n_unanswerable': int(n_unans),
-        'coverage_per_doc': coverage_per_doc,
-        'coverage': coverage_accumulated,
-        'high_coverage_document_ids': document_ids[0.75],
-        'half_coverage_document_ids': document_ids[0.5],
-        'low_coverage_document_ids': document_ids[0.0],
-        'negative_document_ids': document_ids[-1],
-    }
+    # create datasetlist
+    for positive_category, negative_category in [
+        ('high', 'zero'),
+        ('high', 'low'),
+        ('high', 'quarter'),
+        ('high', 'half'),
+        ('half', 'zero'),
+    ]:
+        tag = f"pos_{positive_category}.neg_{negative_category}"
+        if tag not in dataset_dict:
+            dataset_dict[tag] = []
 
-print('Total topics:', len(report))
+        positive_docs = []
+        if positive_category == 'high':
+            positive_docs += document_ids[0.75]
+        if positive_category == 'half':
+            positive_docs += document_ids[0.75] + document_ids[0.5]
 
-# Rank the doumcnet by the coverage
-order = np.argsort(report[qid]['cov']).tolist()[::-1]
-order = list(order)
-positive_document_ids = [docid for i, docid in enumerate(run[qid]) if coverages[i] > 0]
-negative_document_ids = [docid for i, docid in enumerate(run[qid]) if coverages[i] == 0]
-dataset_list[split].append({
-    'query_id': qid, 
-    'query_text': topic[str(qid)],
-    'positive_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance > 0],
-    'negative_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance == 0],
-    'answer': None,
-    'coverages': coverages,
-    'source': 'msmarco-passage'
-})
+        negative_docs = []
+        if negative_category == 'zero':
+            negative_docs += document_ids[-1]
+        if negative_category == 'low':
+            negative_docs += document_ids[0.0] + document_ids[-1]
+        if negative_category == 'quarter':
+            negative_docs += document_ids[0.25] + document_ids[0.0] + document_ids[-1]
+        if negative_category == 'half':
+            negative_docs += document_ids[0.5] + document_ids[0.25] + document_ids[0.0] + document_ids[-1]
+
+        if len(positive_docs) > 0 and len(negative_docs) > 0:
+            dataset_dict[tag].append({
+                'query_id': qid, 
+                'query_text': topic[str(qid)],
+                'positive_document_ids': positive_docs,
+                'negative_document_ids': negative_docs,
+                'answer': None,
+                'source': f'clueweb22-B.tau:{tau}',
+            })
+
+## Transform to dataset
+dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
+print(dataset)
+dataset.push_to_hub("DylanJHJ/crux-researchy")

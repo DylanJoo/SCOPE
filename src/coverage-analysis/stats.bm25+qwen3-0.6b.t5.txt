@@ -1,4 +1,5 @@
-Total topics: 90000
+Total topics: 90000 
+Total fully answerable topics 606
 Average n_subtopics: 14.321955555555556
 Average n_answerable: 5.586266666666667
 Average n_unanswerable: 8.73568888888889
@@ -42,6 +43,8 @@ Average coverage at rank 17: 0.37986672374008257
 Average coverage at rank 18: 0.3840008329538067
 Average coverage at rank 19: 0.38793673958450914
 Average coverage at rank 20: 0.391473878825752
-Average half_coverage_document_ids: 0.28123333333333334
-Average low_coverage_document_ids: 97.93352222222222
 Average high_coverage_document_ids: 0.02728888888888889
+Average half_coverage_document_ids: 0.28123333333333334
+Average quarter_coverage_document_ids: 1.7579555555555555
+Average low_coverage_document_ids: 97.93352222222222
+Average negative_document_ids: 90.5445
