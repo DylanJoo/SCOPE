@@ -1,0 +1,38 @@
+#!/bin/bash -l
+#SBATCH --job-name=encode
+#SBATCH --output=enc-query.out
+#SBATCH --error=enc-query.err
+#SBATCH --partition=gpu 
+#SBATCH --gres=gpu:nvidia_rtx_a6000:1
+#SBATCH --ntasks-per-node=1        
+#SBATCH --nodes=1                
+#SBATCH --array=0-0%1
+#SBATCH --mem=64G
+#SBATCH --time=0-00:10:00
+
+# ENV
+source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
+conda activate pyserini
+
+model_dir=Qwen/Qwen3-Embedding-0.6B
+output_dir=${HOME}/indices/crux-researchy-corpus/${model_dir##*/}
+mkdir -p $output_dir
+
+# Original queqry
+python -m tevatron.retriever.driver.encode \
+  --output_dir=temp \
+  --tokenizer_name bert-base-uncased \
+  --model_name_or_path $model_dir \
+  --bf16 \
+  --per_device_eval_batch_size 16 \
+  --normalize \
+  --pooling last \
+  --padding_side left \
+  --query_prefix "Instruct: Given a web search query, retrieve relevant passages that provide context to the query.\nQuery:" \
+  --append_eos_token \
+  --query_max_len 64 \
+  --dataset_name DylanJHJ/crux-researchy \
+  --dataset_split train \
+  --encode_output_path $output_dir/query_emb.train.pkl \
+  --encode_is_query
+  # --query_prefix "Instruct: Given a report request, retrieve relevant passages that provide context to the report.\nQuery:" \

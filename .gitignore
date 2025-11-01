@@ -1,11 +1,15 @@
 wandb/
 *out
+*swp
 *err
-**/*out
-**/*err
+**/**out*
+**/**err*
+**/**.swp
 
 slurm/qwen3
 slurm/search*
 core
+
+eval.*/result*
 
 runs
