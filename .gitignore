@@ -8,4 +8,6 @@ slurm/qwen3
 slurm/search*
 core
 
+eval.*/result*
+
 runs

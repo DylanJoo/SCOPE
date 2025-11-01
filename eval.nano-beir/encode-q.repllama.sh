@@ -40,7 +40,7 @@ python -m tevatron.retriever.driver.encode  \
   --output_dir=temp \
   --tokenizer_name meta-llama/Llama-3.1-8B-Instruct \
   --model_name_or_path meta-llama/Llama-3.1-8B-Instruct \
-  --lora_name_or_path $model_dir/$checkpoint \
+  --lora_name_or_path $model_dir \
   --lora \
   --bf16 \
   --per_device_eval_batch_size 128 \
@@ -51,5 +51,5 @@ python -m tevatron.retriever.driver.encode  \
   --query_max_len 32 \
   --dataset_name DylanJHJ/nano-beir \
   --dataset_split ${DATASET} \
-  --encode_output_path $output_dir/${DATASET}.query_emb.pkl \
+  --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
   --encode_is_query

@@ -6,14 +6,14 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --array=0-13%1
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --time=00:30:00
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate pyserini
 
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+model_dir=DylanJHJ/repllama-3.1-8b.msmarco-passage.4k
 output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
 
 DATASETS=(

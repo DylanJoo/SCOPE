@@ -45,6 +45,6 @@ python -m tevatron.retriever.driver.encode \
   --dataset_name  DylanJHJ/nano-beir \
   --dataset_split $DATASET \
   --attn_implementation sdpa \
-  --encode_output_path $output_dir/${DATASET}.query_emb.pkl \
+  --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
   --query_max_len 32 \
   --encode_is_query
