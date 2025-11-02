@@ -14,20 +14,9 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-cd ${HOME}/SCOPE
-
-## A100x2: msmarco-passage-aug b40 n640 1ep 24hr 
-# dl19/20: 
-model_dir=DylanJHJ
-checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
-
-## AMD*4: 
-# dl19/20: 
 model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
-checkpoint=checkpoint-3000
-
-output_dir=${HOME}/indices/${model_dir##*/}
-
+checkpoint=checkpoint-4000
+output_dir=${HOME}/indices/msmarco-passage-corpus-new/${model_dir##*/}
 mkdir -p $output_dir
 
 for split in dl19 dl20;do
@@ -50,7 +39,7 @@ for split in dl19 dl20;do
       --dataset_name Tevatron/msmarco-passage-new \
       --corpus_name Tevatron/msmarco-passage-new \
       --dataset_split $split \
-      --encode_output_path $output_dir/$split.query_emb.pkl \
+      --encode_output_path $output_dir/query_emb.$split..pkl \
       --encode_is_query
 done
 wait

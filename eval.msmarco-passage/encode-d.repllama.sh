@@ -15,27 +15,15 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-cd $HOME/SCOPE
-
-# model_dir=DylanJHJ
-# checkpoint=repllama3.1-8b.b40_n640.msmarco-passage
-
-## AMD*4: 
-# dl19/20: 
 model_dir=${HOME}/models/repllama-msmarco-psg.b128_n512.1e-4
-checkpoint=checkpoint-3000
-
-OUTPUT_DIR=${HOME}/indices/${model_dir##*/}
-mkdir -p $OUTPUT_DIR
+checkpoint=checkpoint-4000
+output_dir=${HOME}/indices/msmarco-passage-corpus-new/${model_dir##*/}
+mkdir -p $output_dir
 
 NODELIST=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 TOTAL_SHARDS=64 # total shards (64 shards = 8 nodes * 8 GPUs)
 SHARDS_PER_NODE=$(( TOTAL_SHARDS / SLURM_NNODES ))
-
 EXCLUDE_TITLE=true
-if [[ $model_dir == *"title"* ]]; then
-    EXCLUDE_TITLE=false
-fi
 
 i=0
 for node in $NODELIST; do
@@ -71,7 +59,7 @@ for node in $NODELIST; do
           --passage_max_len 256 \
           --dataset_number_of_shards $TOTAL_SHARDS \
           --corpus_name Tevatron/msmarco-passage-corpus-new \
-          --encode_output_path $OUTPUT_DIR/corpus_emb.\${SHARD}.pkl \
+          --encode_output_path $output_dir/corpus_emb.\${SHARD}.pkl \
           --dataset_shard_index \${SHARD} & 
     done
     wait
