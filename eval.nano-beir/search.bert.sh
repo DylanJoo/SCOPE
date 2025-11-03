@@ -5,7 +5,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
-#SBATCH --array=0-13%1
+#SBATCH --array=0-12%1
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
 
@@ -17,9 +17,8 @@ conda activate crux
 
 # model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 # model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-6.train
-model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-5.10k.train
+model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-5.25k.train
 output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
-model_dir=$model_dir/checkpoint-25000
 mkdir -p $output_dir
 
 DATASETS=(
@@ -29,7 +28,6 @@ DATASETS=(
 "nano_beir.fever"
 "nano_beir.fiqa"
 "nano_beir.hotpotqa"
-"nano_beir.msmarco"
 "nano_beir.nfcorpus"
 "nano_beir.nq"
 "nano_beir.quora"
@@ -37,6 +35,7 @@ DATASETS=(
 "nano_beir.scifact"
 "nano_beir.webis_touche2020"
 )
+# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
 echo Encoding $DATASET ...

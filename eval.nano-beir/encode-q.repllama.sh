@@ -6,7 +6,7 @@
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
-#SBATCH --array=0-13%2
+#SBATCH --array=0-12%2
 #SBATCH --mem=64G
 #SBATCH --time=10:00:00
 
@@ -25,7 +25,6 @@ DATASETS=(
 "nano_beir.fever"
 "nano_beir.fiqa"
 "nano_beir.hotpotqa"
-"nano_beir.msmarco"
 "nano_beir.nfcorpus"
 "nano_beir.nq"
 "nano_beir.quora"
@@ -33,6 +32,7 @@ DATASETS=(
 "nano_beir.scifact"
 "nano_beir.webis_touche2020"
 )
+# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
 echo Encoding $DATASET ...

@@ -1,12 +1,12 @@
 #!/bin/bash -l
 #SBATCH --job-name=encode
-#SBATCH --output=enc-query.out
-#SBATCH --error=enc-query.err
+#SBATCH --output=enc-query.out.%a
+#SBATCH --error=enc-query.err.%a
 #SBATCH --partition=gpu 
 #SBATCH --gres=gpu:a100:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
-#SBATCH --array=0-13%1
+#SBATCH --array=0-12%1
 #SBATCH --mem=32G
 #SBATCH --time=0-00:10:00
 
@@ -18,7 +18,7 @@ conda activate crux
 
 # model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 # model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-6.train
-model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-5.10k.train
+model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-5.25k.train
 output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
 model_dir=$model_dir/checkpoint-25000
 mkdir -p $output_dir
@@ -30,7 +30,6 @@ DATASETS=(
 "nano_beir.fever"
 "nano_beir.fiqa"
 "nano_beir.hotpotqa"
-"nano_beir.msmarco"
 "nano_beir.nfcorpus"
 "nano_beir.nq"
 "nano_beir.quora"
@@ -38,6 +37,7 @@ DATASETS=(
 "nano_beir.scifact"
 "nano_beir.webis_touche2020"
 )
+# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
 echo Encoding $DATASET ...
