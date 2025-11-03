@@ -16,8 +16,9 @@ tau = args.tau
 
 topic = load_topic(split)
 subtopics = load_subtopics(split)
-run = load_run_or_qrel(f'/exp/scale25/artifacts/crux/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
-judge = load_ratings('/exp/scale25/artifacts/crux/crux-researchy/judge/')
+CRUX_ROOT='/exp/scale25/artifacts/crux'
+run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
+judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
 dataset_dict = {'train': []}
 for qid in tqdm(run):
@@ -52,16 +53,29 @@ for qid in tqdm(run):
                 break
 
     # create datasetlist
+
+    # 1. single-list sampling
     document_ids_all = [docid for docid in run[qid]]
-    dataset_dict['train'].append({
+    dataset_dict['pos_20.neg_51'].append({
         'query_id': qid, 
         'query_text': topic[str(qid)],
-        'positive_document_ids': document_ids_all[:20], 
-        'negative_document_ids': document_ids_all[51:],
+        'positive_document_ids': document_ids_all[:20],
+        'negative_document_ids': document_ids_all[50:],
         'answer': None,
         'source': f'clueweb22-B',
     })
 
+    # 2. single-list sampling + filter
+    dataset_dict['pos_20.neg_51.filtered'].append({
+        'query_id': qid, 
+        'query_text': topic[str(qid)],
+        'positive_document_ids': [docid for docid in document_ids_all[:20] if docid not in document_ids[-1]] , 
+        'negative_document_ids': document_ids_all[50:],
+        'answer': None,
+        'source': f'clueweb22-B',
+    })
+
+    # 3. coverage-based sampling
     for positive_category, negative_category in [
         ('high', 'zero'),
         ('high', 'low'),
