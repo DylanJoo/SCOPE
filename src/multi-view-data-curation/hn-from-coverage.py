@@ -59,13 +59,13 @@ for qid in tqdm(run):
     dataset_dict['pos_20.neg_51'].append({
         'query_id': qid, 
         'query_text': topic[str(qid)],
-        'positive_document_ids': document_ids_all[:20],
+        'positive_document_ids': document_ids_all[:20], 
         'negative_document_ids': document_ids_all[50:],
         'answer': None,
         'source': f'clueweb22-B',
     })
 
-    # 2. single-list sampling + filter
+    # 2. single-list sampling + filter FP
     dataset_dict['pos_20.neg_51.filtered'].append({
         'query_id': qid, 
         'query_text': topic[str(qid)],

@@ -3,19 +3,24 @@
 #SBATCH --output=enc-query.out
 #SBATCH --error=enc-query.err
 #SBATCH --partition=gpu 
-#SBATCH --gres=gpu:nvidia_rtx_a6000:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
 #SBATCH --array=0-13%1
-#SBATCH --mem=64G
+#SBATCH --mem=32G
 #SBATCH --time=0-00:10:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
-conda activate pyserini
+# source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
+# conda activate pyserini
+module load anaconda3/2024.2 # grid
+conda activate crux
 
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+# model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+# model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-6.train
+model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-5.10k.train
 output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
+model_dir=$model_dir/checkpoint-25000
 mkdir -p $output_dir
 
 DATASETS=(
