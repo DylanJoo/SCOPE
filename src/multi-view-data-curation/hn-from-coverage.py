@@ -57,7 +57,7 @@ for qid in tqdm(run):
         'query_id': qid, 
         'query_text': topic[str(qid)],
         'positive_document_ids': document_ids_all[:20], 
-        'negative_document_ids': document_ids_all[51:],
+        'negative_document_ids': document_ids_all[50:],
         'answer': None,
         'source': f'clueweb22-B',
     })
