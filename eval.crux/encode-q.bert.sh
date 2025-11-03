@@ -18,10 +18,9 @@ output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 CRUX_ROOT=/home/dju/datasets/crux
 mkdir -p $output_dir
 
-for dataset in crux-mds-duc04 crux-mds-multi-news;do
-    for topic_path in $CRUX_ROOT/$dataset/*jsonl; do
-        echo Encoding $topic_file
-
+for subset in crux-mds-duc04 crux-mds-multi_news;do
+    for topic_path in $CRUX_ROOT/$subset/topic/*jsonl; do
+        echo "Encoding $topic_path"
         python -m tevatron.retriever.driver.encode \
           --output_dir=temp \
           --tokenizer_name bert-base-uncased \
@@ -30,7 +29,7 @@ for dataset in crux-mds-duc04 crux-mds-multi-news;do
           --per_device_eval_batch_size 50 \
           --dataset_path $topic_path \
           --attn_implementation sdpa \
-          --encode_output_path $output_dir/query_emb.${dataset}.pkl \
+          --encode_output_path $output_dir/query_emb.${subset}.pkl \
           --query_max_len 128 \
           --encode_is_query
     done

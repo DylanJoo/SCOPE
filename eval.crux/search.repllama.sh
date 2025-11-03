@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --mem=64G
 #SBATCH --time=0-00:30:00         # Run time (d-hh:mm:ss)
 
 # ENV
@@ -12,7 +12,7 @@ source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate ir
 
 crux_root=${HOME}/datasets/crux
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+model_dir=DylanJHJ/repllama-3.1-8b.msmarco-passage.4k
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
 

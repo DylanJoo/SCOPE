@@ -18,11 +18,10 @@ output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 CRUX_ROOT=/home/dju/datasets/crux
 mkdir -p $output_dir
 
-for dataset in crux-mds-duc04 crux-mds-multi-news;do
-    for topic_path in $CRUX_ROOT/$dataset/*jsonl; do
-        echo Encoding $topic_file
-
-        python -m tevatron.retriever.driver.encode  \
+for subset in crux-mds-duc04 crux-mds-multi_news;do
+    for topic_path in $CRUX_ROOT/$subset/topic/*jsonl; do
+        echo Encoding $topic_path
+        python -m tevatron.retriever.driver.encode \
           --output_dir=temp \
           --tokenizer_name meta-llama/Llama-3.1-8B-Instruct \
           --model_name_or_path meta-llama/Llama-3.1-8B-Instruct \
@@ -34,9 +33,9 @@ for dataset in crux-mds-duc04 crux-mds-multi-news;do
           --pooling last  \
           --query_prefix "query: " \
           --append_eos_token \
-          --query_max_len 128 \
           --dataset_path $topic_path \
-          --encode_output_path $output_dir/query_emb.${dataset}.pkl \
+          --encode_output_path $output_dir/query_emb.${subset}.pkl \
+          --query_max_len 128 \
           --encode_is_query
     done
 done
