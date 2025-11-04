@@ -8,7 +8,7 @@ from crux.tools.researchy.ir_utils import load_topic, load_subtopics
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--split', type=str, default='train', help='Dataset split to analyze')
-parser.add_argument('--tau', type=int, default=3, help='Threshold for answerable subtopics')
+parser.add_argument('--tau', type=int, default=4, help='Threshold for answerable subtopics')
 args = parser.parse_args()
 
 # main
@@ -21,7 +21,7 @@ CRUX_ROOT = (os.environ["CRUX_ROOT"] or '/exp/scale25/artifacts/crux')
 run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
-dataset_dict = {'train': []}
+dataset_dict = {'pos_20.neg_51': [], 'pos_20.neg_51.filtered': []}
 for qid in tqdm(run):
 
     # stat1: answerable 
@@ -67,14 +67,16 @@ for qid in tqdm(run):
     })
 
     # 2. single-list sampling + filter FP
-    dataset_dict['pos_20.neg_51.filtered'].append({
-        'query_id': qid, 
-        'query_text': topic[str(qid)],
-        'positive_document_ids': [docid for docid in document_ids_all[:20] if docid not in document_ids[-1]] , 
-        'negative_document_ids': document_ids_all[50:],
-        'answer': None,
-        'source': f'clueweb22-B',
-    })
+    filterd_top20 = [docid for docid in document_ids_all[:20] if docid not in document_ids[-1]]
+    if len(filterd_top20) > 0:
+        dataset_dict['pos_20.neg_51.filtered'].append({
+            'query_id': qid, 
+            'query_text': topic[str(qid)],
+            'positive_document_ids': filterd_top20,
+            'negative_document_ids': document_ids_all[50:],
+            'answer': None,
+            'source': f'clueweb22-B.tau:{tau}',
+        })
 
     # 3. coverage-based sampling
     for positive_category, negative_category in [

@@ -14,7 +14,7 @@
 # source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 # conda activate pyserini
 module load anaconda3/2024.2 # grid
-conda activate crux
+conda activate crc
 
 # model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 # model_dir=/home/hltcoe/jhueiju/models/crux-research-train-series/bert-crux-researchy.b32_n256.1e-6.train
@@ -43,7 +43,7 @@ DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 echo Encoding $DATASET ...
 python -m tevatron.retriever.driver.encode \
   --output_dir=temp \
-  --tokenizer_name bert-base-uncased \
+  --tokenizer_name answerdotai/ModernBERT-base \
   --model_name_or_path $model_dir \
   --bf16 \
   --per_device_eval_batch_size 50 \
