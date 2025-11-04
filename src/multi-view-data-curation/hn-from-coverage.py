@@ -1,3 +1,4 @@
+import os
 from tqdm import tqdm 
 import argparse
 import numpy as np
@@ -16,7 +17,7 @@ tau = args.tau
 
 topic = load_topic(split)
 subtopics = load_subtopics(split)
-CRUX_ROOT='/exp/scale25/artifacts/crux'
+CRUX_ROOT = (os.environ["CRUX_ROOT"] or '/exp/scale25/artifacts/crux')
 run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
