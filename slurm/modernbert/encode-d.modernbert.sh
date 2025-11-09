@@ -14,8 +14,8 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-model_dir=${HOME}/models/modernbert-msmarco-psg.b64_n512.1e-5
-checkpoint=checkpoint-25000
+model_dir=${HOME}/models/modernbert-msmarco-psg.b64_n512.5e-6.norm
+checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
 mkdir -p $output_dir
 
@@ -31,6 +31,8 @@ for device in {0..7};do
       --model_name_or_path $model_dir/$checkpoint \
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
+      --pooling cls \
+      --normalize \
       --bf16 \
       --exclude_title \
       --dataset_name Tevatron/msmarco-passage-corpus-new \

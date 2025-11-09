@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/2gpu.%j.out
-#SBATCH --error=logs/2gpu.%j.err
+#SBATCH --output=logs/modernbert.%j.out
+#SBATCH --error=logs/modernbert.%j.err
 #SBATCH --partition=small-g         # partition name
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
@@ -17,7 +17,7 @@ module use /appl/local/training/modules/AI-20241126/
 bsz=64
 nsample=512
 lr=1e-5
-model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}
+model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}.mean
 
 mkdir -p ${model_dir}
 
@@ -31,7 +31,7 @@ srun singularity exec $SIF \
     --multi_gpu \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
-    --exclude_title True \
+    --exclude_title \
     --output_dir ${model_dir} \
     --model_name_or_path answerdotai/ModernBERT-base \
     --save_steps 5000 \
@@ -45,6 +45,7 @@ srun singularity exec $SIF \
     --eval_dataset_name DylanJHJ/Qrels \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
     --eval_group_size 8 \
+    --pooling mean \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
     --learning_rate $lr \
@@ -55,4 +56,4 @@ srun singularity exec $SIF \
     --warmup_steps 2500 \
     --logging_steps 10 \
     --overwrite_output_dir \
-    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}
+    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.mean

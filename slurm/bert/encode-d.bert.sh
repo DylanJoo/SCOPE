@@ -14,26 +14,11 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-cd ${HOME}/SCOPE
-
-## A100x1: msmarco-passage-aug b32 n8 3ep 24hr
-# model_dir=${HOME}/models/dpr-bert-base-uncased.b32_n256.msmarco-passage.3ep
-# checkpoint=checkpoint-45000
-
-## AMD*2
-model_dir=${HOME}/models/bert-msmarco-psg.b64_n512.1e-5
-checkpoint=checkpoint-25000
+model_dir=${HOME}/models/dpr.bert-base-uncased.msmarco-passage.25k
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
 
-EXCLUDE_TITLE="--exclude_title "
-if [[ $model_dir == *"title"* ]]; then
-    EXCLUDE_TITLE=""
-    echo 'Title is included.'
-fi
-
-# Start experimentss
 for device in {0..7};do
     SHARD=$device
     export CUDA_VISIBLE_DEVICES=$device
@@ -42,11 +27,11 @@ for device in {0..7};do
     python -m tevatron.retriever.driver.encode \
       --output_dir=temp \
       --tokenizer_name bert-base-uncased \
-      --model_name_or_path $model_dir/$checkpoint \
+      --model_name_or_path $model_dir \
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --bf16 \
-      ${EXCLUDE_TITLE} \
+      --exclude_title \
       --dataset_name Tevatron/msmarco-passage-corpus-new \
       --corpus_name Tevatron/msmarco-passage-corpus-new \
       --encode_output_path $output_dir/corpus_emb.${SHARD}.pkl \
@@ -54,5 +39,4 @@ for device in {0..7};do
       --attn_implementation sdpa \
       --dataset_shard_index ${SHARD} &
 done
-
 wait
