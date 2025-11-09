@@ -14,26 +14,26 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-model_dir=${HOME}/models/modernbert-msmarco-psg.b64_n512.5e-6.norm
+model_dir=${HOME}/models/bert-crux-researchy.b32_n256.1e-5.25k.train
 checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
+
 mkdir -p $output_dir
 
-# Start experiments
-for split in dl19 dl20;do
+echo start running
+for split in dl19 dl20 dev;do
     export CUDA_VISIBLE_DEVICES=0
     export HIP_VISIBLE_DEVICES=0
     singularity exec $SIF \
     python -m tevatron.retriever.driver.encode \
       --output_dir=temp \
-      --tokenizer_name answerdotai/ModernBERT-base \
+      --tokenizer_name bert-base-uncased \
       --model_name_or_path $model_dir/$checkpoint \
+      --bf16 \
       --per_device_eval_batch_size 1024 \
       --dataset_name Tevatron/msmarco-passage-new \
       --dataset_split $split \
-      --bf16 \
-      --pooling cls \
-      --normalize \
+      --attn_implementation sdpa \
       --encode_output_path $output_dir/query_emb.$split.pkl \
       --query_max_len 32 \
       --encode_is_query

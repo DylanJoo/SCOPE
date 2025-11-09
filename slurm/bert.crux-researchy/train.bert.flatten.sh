@@ -1,23 +1,25 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.%j.out
-#SBATCH --error=logs/modernbert.%j.err
+#SBATCH --output=logs/train.out.%j
+#SBATCH --error=logs/train.err.%j
 #SBATCH --partition=small-g         # partition name
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
 #SBATCH --mem=120G
-#SBATCH --time=2-00:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=3-00:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
 bsz=64
-nsample=512
+nsample=256
 lr=1e-5
-model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}.mean
+split=flatten
+model_dir=${HOME}/models/bert-crux-researchy.${bsz}_n${nsample}.${lr}.${split}
+pretrained=bert-base-uncased
 
 mkdir -p ${model_dir}
 
@@ -33,27 +35,30 @@ srun singularity exec $SIF \
     tevatron.retriever.driver.train \
     --exclude_title \
     --output_dir ${model_dir} \
-    --model_name_or_path answerdotai/ModernBERT-base \
-    --save_steps 5000 \
-    --dataset_name Tevatron/msmarco-passage-new \
-    --corpus_name Tevatron/msmarco-passage-corpus-new \
-    --per_device_train_batch_size 32 \
+    --model_name_or_path $pretrained \
+    --save_steps 10000 \
+    --dataset_name DylanJHJ/crux-researchy \
+    --dataset_split $split \
+    --corpus_name DylanJHJ/crux-researchy-corpus \
+    --per_device_train_batch_size 16 \
     --train_group_size 8 \
     --prediction_loss_only True \
     --eval_strategy steps \
     --do_eval True \
     --eval_dataset_name DylanJHJ/Qrels \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
+    --eval_corpus_name Tevatron/msmarco-passage-corpus-new \
     --eval_group_size 8 \
-    --pooling mean \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
     --learning_rate $lr \
     --query_max_len 32 \
-    --passage_max_len 196 \
+    --passage_max_len 512 \
     --dataloader_num_workers 2 \
-    --max_steps 25000 \
-    --warmup_steps 2500 \
+    --max_steps 50000 \
+    --warmup_steps 5000 \
     --logging_steps 10 \
+    --attn_implementation sdpa \
+    --gradient_accumulation_steps 2 \
     --overwrite_output_dir \
-    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.mean
+    --run_name bert-base.crux-researchy.b${bsz}_n${nsample}.${lr}.${split}

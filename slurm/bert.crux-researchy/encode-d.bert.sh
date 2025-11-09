@@ -14,11 +14,13 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-model_dir=${HOME}/models/dpr.bert-base-uncased.msmarco-passage.25k
+model_dir=${HOME}/models/bert-crux-researchy.b32_n256.1e-5.25k.train
+checkpoint=checkpoint-20000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 mkdir -p $output_dir
 
+# Start experimentss
 for device in {0..7};do
     SHARD=$device
     export CUDA_VISIBLE_DEVICES=$device
@@ -27,7 +29,7 @@ for device in {0..7};do
     python -m tevatron.retriever.driver.encode \
       --output_dir=temp \
       --tokenizer_name bert-base-uncased \
-      --model_name_or_path $model_dir \
+      --model_name_or_path $model_dir/$checkpoint \
       --per_device_eval_batch_size 1024 \
       --passage_max_len 256 \
       --bf16 \
@@ -39,4 +41,5 @@ for device in {0..7};do
       --attn_implementation sdpa \
       --dataset_shard_index ${SHARD} &
 done
+
 wait
