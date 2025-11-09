@@ -1,0 +1,10 @@
+11/03/2025 13:33:43 - INFO - __main__ -   Pattern match found 8 files; loading them into index.
+Loading shards into index:   0%|          | 0/8 [00:00<?, ?it/s]Loading shards into index:  12%|█▎        | 1/8 [00:00<00:03,  2.18it/s]Loading shards into index:  25%|██▌       | 2/8 [00:04<00:16,  2.82s/it]Loading shards into index:  38%|███▊      | 3/8 [00:11<00:22,  4.59s/it]Loading shards into index:  50%|█████     | 4/8 [00:20<00:25,  6.33s/it]Loading shards into index:  62%|██████▎   | 5/8 [00:25<00:16,  5.62s/it]Loading shards into index:  75%|███████▌  | 6/8 [00:40<00:17,  8.87s/it]Loading shards into index:  88%|████████▊ | 7/8 [00:44<00:07,  7.39s/it]Loading shards into index: 100%|██████████| 8/8 [00:51<00:00,  7.20s/it]Loading shards into index: 100%|██████████| 8/8 [00:51<00:00,  6.41s/it]
+11/03/2025 13:34:37 - INFO - __main__ -   No GPU found or using faiss-cpu. Back to CPU.
+11/03/2025 13:34:37 - INFO - __main__ -   Index Search Start
+11/03/2025 13:34:48 - INFO - __main__ -   Index Search Finished
+11/03/2025 13:34:51 - INFO - __main__ -   Pattern match found 8 files; loading them into index.
+Loading shards into index:   0%|          | 0/8 [00:00<?, ?it/s]Loading shards into index:  12%|█▎        | 1/8 [00:00<00:03,  2.25it/s]Loading shards into index:  25%|██▌       | 2/8 [00:02<00:09,  1.61s/it]Loading shards into index:  38%|███▊      | 3/8 [00:06<00:11,  2.37s/it]Loading shards into index:  50%|█████     | 4/8 [00:12<00:15,  3.79s/it]Loading shards into index:  62%|██████▎   | 5/8 [00:13<00:08,  2.90s/it]Loading shards into index:  75%|███████▌  | 6/8 [00:22<00:10,  5.15s/it]Loading shards into index:  88%|████████▊ | 7/8 [00:24<00:03,  3.90s/it]Loading shards into index: 100%|██████████| 8/8 [00:26<00:00,  3.46s/it]Loading shards into index: 100%|██████████| 8/8 [00:26<00:00,  3.35s/it]
+11/03/2025 13:35:18 - INFO - __main__ -   No GPU found or using faiss-cpu. Back to CPU.
+11/03/2025 13:35:18 - INFO - __main__ -   Index Search Start
+11/03/2025 13:35:30 - INFO - __main__ -   Index Search Finished
