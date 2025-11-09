@@ -75,7 +75,7 @@ for qid in tqdm(run):
             'positive_document_ids': filterd_top20,
             'negative_document_ids': document_ids_all[50:],
             'answer': None,
-            'source': f'clueweb22-B.tau:{tau}',
+            'source': f'crux-researchy.tau:{tau}.clueweb22-B',
         })
 
     # 3. coverage-based sampling
@@ -113,10 +113,11 @@ for qid in tqdm(run):
                 'positive_document_ids': positive_docs,
                 'negative_document_ids': negative_docs,
                 'answer': None,
-                'source': f'clueweb22-B.tau:{tau}',
+                'source': f'crux-researchy.tau:{tau}.clueweb22-B',
             })
 
-## Transform to dataset
+## Transform to dataset (the base)
+## Transform to dataset (other subset)
+dataset_dict['train'] = dataset_dict['pos_20.neg_51']
 dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
-print(dataset)
 dataset.push_to_hub("DylanJHJ/crux-researchy")
