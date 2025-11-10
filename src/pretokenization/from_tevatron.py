@@ -1,0 +1,93 @@
+from tqdm import tqdm
+from tevatron.retriever.dataset import TrainDataset
+from tevatron.retriever.dataset_dev import QrelDataset
+from tevatron.retriever.arguments import DataArguments
+from transformers import AutoTokenizer
+from datasets import Dataset
+
+# new_dataset_name = 'msmarco-passage-new-pretokenized'
+# dataset_name = 'Tevatron/msmarco-passage-new'
+# corpus_name = 'Tevatron/msmarco-passage-corpus-new'
+# split = 'train'
+
+new_dataset_name = 'crux-researchy-flatten-pretokenized'
+dataset_name = 'DylanJHJ/crux-researchy'
+corpus_name = 'DylanJHJ/crux-researchy-corpus'
+split = 'flatten'
+
+# Load config
+data_args = DataArguments(
+    exclude_title=True,
+    dataset_name=dataset_name,
+    dataset_split=split,
+    corpus_name=corpus_name,
+    train_group_size=8,
+    query_max_len=32,
+    passage_max_len=512,
+    eval_dataset_name='DylanJHJ/Qrels',
+    eval_dataset_split='msmarco_passage.trec_dl_2019',
+    eval_corpus_name='Tevatron/msmarco-passage-corpus-new',
+    eval_group_size=8,
+)
+
+# Pre-tokenization
+def pretokenize(example):
+    # Each example has a single query string and a list of passage strings
+    q_text = example["query"]
+    print(q_text)
+    p_texts = example["passage_group"]
+    print(p_texts)
+
+    # Tokenize query
+    q_enc = tokenizer(
+        q_text,
+        truncation=True,
+        padding=False,
+        max_length=data_args.query_max_len - 1 if data_args.append_eos_token else data_args.query_max_len,
+        add_special_tokens=True,
+    )
+
+    # Tokenize all passages
+    p_enc = tokenizer(
+        p_texts,
+        truncation=True,
+        padding=False,
+        max_length=data_args.passage_max_len - 1 if data_args.append_eos_token else data_args.passage_max_len,
+        add_special_tokens=True,
+    )
+
+    return {
+        "query_tokenized": q_enc["input_ids"],
+        "passage_tokenized": p_enc["input_ids"],
+    }
+
+# Load dataset
+dataset_dict = {}
+for split in ['train', 'eval']:
+
+    # Load tevatron dataset
+    if split == 'train':
+        pt_dataset = TrainDataset(data_args)
+    if split == 'eval':
+        pt_dataset = QrelDataset(data_args)
+
+    # Convert to hf
+    hf_data = []
+    for i in tqdm(range(len(pt_dataset)), desc="Converting to HF dataset"):
+        query, passages = pt_dataset[i]
+        hf_data.append({"query": query[0], "passage_group": [p[0] for p in passages] })
+
+    hf_dataset = Dataset.from_list(hf_data)
+
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained('answerdotai/ModernBERT-base')
+
+    # Apply tokenization
+    tokenized_hf_dataset = hf_dataset.map(pretokenize, num_proc=64)
+    dataset_dict[split] = tokenized_hf_dataset
+
+# Save for later use
+tokenized_hf_dataset_dict = DatasetDict( 
+    {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict}
+)
+tokenized_hf_dataset.save_to_disk(f"/scratch-shared/dju/datasets/{new_dataset_name}")
