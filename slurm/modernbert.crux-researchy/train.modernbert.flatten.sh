@@ -35,7 +35,7 @@ srun singularity exec $SIF \
     tevatron.retriever.driver.train \
     --exclude_title \
     --output_dir ${model_dir} \
-    --model_name_or_path answerdotai/ModernBERT-base \
+    --model_name_or_path $pretrained \
     --save_steps 10000 \
     --dataset_name DylanJHJ/crux-researchy \
     --dataset_split $split \
@@ -61,4 +61,4 @@ srun singularity exec $SIF \
     --logging_steps 10 \
     --gradient_accumulation_steps 2 \
     --overwrite_output_dir \
-    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.${split}
+    --run_name modernbert-base.crux-researchy.b${bsz}_n${nsample}.${lr}.${split}

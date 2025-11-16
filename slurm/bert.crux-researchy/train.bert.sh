@@ -62,4 +62,4 @@ srun singularity exec $SIF \
     --attn_implementation sdpa \
     --gradient_accumulation_steps 2 \
     --overwrite_output_dir \
-    --run_name bert-base.crux-researchy.${split}.b${bsz}_n${nsample}.${lr}.${split}
+    --run_name bert-base.crux-researchy.b${bsz}_n${nsample}.${lr}.${split}
