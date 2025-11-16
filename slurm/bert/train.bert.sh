@@ -31,7 +31,7 @@ srun singularity exec $SIF \
     --multi_gpu \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
-    --exclude_title True \
+    --exclude_title \
     --output_dir ${model_dir} \
     --model_name_or_path bert-base-uncased \
     --save_steps 5000 \

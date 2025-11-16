@@ -18,7 +18,7 @@ bsz=32
 nsample=256
 lr=1e-6
 split=train
-model_dir=${HOME}/models/bert-crux-researchy.${split}.b${bsz}_n${nsample}.${lr}.${split}
+model_dir=${HOME}/models/bert-crux-researchy.b${bsz}_n${nsample}.${lr}.${split}
 pretrained=bert-base-uncased
 pretrained=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 
@@ -34,7 +34,7 @@ srun singularity exec $SIF \
     --multi_gpu \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
-    --exclude_title True \
+    --exclude_title \
     --output_dir ${model_dir} \
     --model_name_or_path $pretrained \
     --save_steps 10000 \

@@ -17,7 +17,7 @@ module use /appl/local/training/modules/AI-20241126/
 bsz=128
 nsample=512
 lr=1e-4
-model_dir=${HOME}/models/repllama-msmarco-psg.b${bsz}_n${nsample}.${lr}
+model_dir=${HOME}/models/repllama-crux-researchy.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
@@ -56,6 +56,7 @@ srun singularity exec $SIF \
     --do_eval True \
     --eval_dataset_name DylanJHJ/Qrels \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
+    --eval_corpus_name Tevatron/msmarco-passage-corpus-new \
     --eval_group_size 8 \
     --per_device_eval_batch_size 16 \
     --eval_steps 100 \
@@ -69,4 +70,4 @@ srun singularity exec $SIF \
     --gradient_checkpointing \
     --gradient_accumulation_steps 4 \
     --overwrite_output_dir \
-    --run_name repllama3-lora.msmarco-passage.b${bsz}_n${nsample}.${lr}
+    --run_name repllama3-lora.crux-researchy.b${bsz}_n${nsample}.${lr}
