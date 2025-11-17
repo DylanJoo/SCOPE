@@ -12,6 +12,8 @@
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference
+# module load anaconda3/2024.2 # grid
+# conda activate crc
 
 model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
@@ -29,12 +31,28 @@ DATASETS=(
 "beir.quora"
 "beir.scidocs"
 "beir.scifact"
+"beir.trec_covid"
 "beir.webis_touche2020"
 )
-# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-echo Encoding $DATASET ...
+QRELS=(
+"beir/arguana"
+"beir/climate-fever"
+"beir/dbpedia-entity/test"
+"beir/fever/test"
+"beir/fiqa/test"
+"beir/hotpotqa/test"
+"beir/nfcorpus/test"
+"beir/nq"
+"beir/quora/test"
+"beir/scidocs"
+"beir/scifact/test"
+"beir/trec-covid"
+"beir/webis-touche2020/v2"
+)
+irds_tag=${QRELS[$SLURM_ARRAY_TASK_ID]}
+
 python -m tevatron.retriever.driver.search \
     --query_reps $output_dir/query_emb.${DATASET}.pkl \
     --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
@@ -47,8 +65,7 @@ python -m tevatron.utils.format.convert_result_to_trec \
     --input $output_dir/${DATASET}.run \
     --output $output_dir/${DATASET}.trec
 
-irds_tag=$(echo "$DATASET" | sed 's/_/-/g; s/\./\//g')
 result=$(python -m ir_measures $irds_tag $output_dir/${DATASET}.trec nDCG@10)
 
-short_name=$(basename "$irds_tag" | cut -c1-3)
+short_name=$(basename "$DATASET" | cut -c6-8)
 echo "${short_name} | $result"
