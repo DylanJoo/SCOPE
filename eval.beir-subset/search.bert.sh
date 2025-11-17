@@ -12,27 +12,24 @@
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference
-# module load anaconda3/2024.2 # grid
-# conda activate crc
 
-model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4
-output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
-model_dir=${model_dir}/checkpoint-20000
+model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
 DATASETS=(
-"nano_beir.arguana"
-"nano_beir.climate_fever"
-"nano_beir.dbpedia_entity"
-"nano_beir.fever"
-"nano_beir.fiqa"
-"nano_beir.hotpotqa"
-"nano_beir.nfcorpus"
-"nano_beir.nq"
-"nano_beir.quora"
-"nano_beir.scidocs"
-"nano_beir.scifact"
-"nano_beir.webis_touche2020"
+"beir.arguana"
+"beir.climate_fever"
+"beir.dbpedia_entity"
+"beir.fever"
+"beir.fiqa"
+"beir.hotpotqa"
+"beir.nfcorpus"
+"beir.nq"
+"beir.quora"
+"beir.scidocs"
+"beir.scifact"
+"beir.webis_touche2020"
 )
 # "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
