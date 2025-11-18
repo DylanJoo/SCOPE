@@ -23,7 +23,7 @@ for split in ['msmarco_passage.trec_dl_2019', 'msmarco_passage.trec_dl_2020']:
 
     dataset_dict[split] = []
     for qid in qrel:
-        # relevances = [relevance for docid, relevance in qrel[qid].items()]
+        relevances = [relevance for docid, relevance in qrel[qid].items()]
 
         dataset_dict[split].append({
             'query_id': qid, 
@@ -31,7 +31,8 @@ for split in ['msmarco_passage.trec_dl_2019', 'msmarco_passage.trec_dl_2020']:
             'positive_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance > 0],
             'negative_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance == 0],
             'answer': None,
-            'source': 'msmarco-passage'
+            'source': 'msmarco-passage',
+            'relevances': relevances,
         })
 
 ## QRELS from MSMARCO
@@ -58,10 +59,7 @@ for split in ['msmarco_passage.dev.small']:
 
     dataset_dict[split] = []
     for qid in qrel:
-        # relevances = [relevance for docid, relevance in qrel[qid].items()]
-
-        negative_document_ids = [docid for docid, relevance in qrel[qid].items() if relevance == 0]
-        positive_document_ids = [docid for docid, relevance in qrel[qid].items() if relevance > 0]
+        relevances = [relevance for docid, relevance in qrel[qid].items()]
 
         if len(negative_document_ids) > 0 and len(positive_document_ids) > 0:
             dataset_dict[split].append({
@@ -70,7 +68,8 @@ for split in ['msmarco_passage.dev.small']:
                 'positive_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance > 0],
                 'negative_document_ids': [docid for docid, relevance in qrel[qid].items() if relevance == 0],
                 'answer': None,
-                'source': 'msmarco-passage'
+                'source': 'msmarco-passage',
+                'relevances': relevances,
             })
 
 ## Transform to dataset
