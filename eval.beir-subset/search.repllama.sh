@@ -11,29 +11,48 @@
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
-conda activate pyserini
+conda activate inference
+# module load anaconda3/2024.2 # grid
+# conda activate crc
 
 model_dir=DylanJHJ/repllama-3.1-8b.msmarco-passage.4k
-output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
+output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+mkdir -p $output_dir
 
 DATASETS=(
-"nano_beir.arguana"
-"nano_beir.climate_fever"
-"nano_beir.dbpedia_entity"
-"nano_beir.fever"
-"nano_beir.fiqa"
-"nano_beir.hotpotqa"
-"nano_beir.nfcorpus"
-"nano_beir.nq"
-"nano_beir.quora"
-"nano_beir.scidocs"
-"nano_beir.scifact"
-"nano_beir.webis_touche2020"
+"beir.arguana"
+"beir.climate_fever"
+"beir.dbpedia_entity"
+"beir.fever"
+"beir.fiqa"
+"beir.hotpotqa"
+"beir.nfcorpus"
+"beir.nq"
+"beir.quora"
+"beir.scidocs"
+"beir.scifact"
+"beir.trec_covid"
+"beir.webis_touche2020"
 )
-# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-echo Encoding $DATASET ...
+QRELS=(
+"beir/arguana"
+"beir/climate-fever"
+"beir/dbpedia-entity/test"
+"beir/fever/test"
+"beir/fiqa/test"
+"beir/hotpotqa/test"
+"beir/nfcorpus/test"
+"beir/nq"
+"beir/quora/test"
+"beir/scidocs"
+"beir/scifact/test"
+"beir/trec-covid"
+"beir/webis-touche2020/v2"
+)
+irds_tag=${QRELS[$SLURM_ARRAY_TASK_ID]}
+
 python -m tevatron.retriever.driver.search \
     --query_reps $output_dir/query_emb.${DATASET}.pkl \
     --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
@@ -46,8 +65,7 @@ python -m tevatron.utils.format.convert_result_to_trec \
     --input $output_dir/${DATASET}.run \
     --output $output_dir/${DATASET}.trec
 
-irds_tag=$(echo "$DATASET" | sed 's/_/-/g; s/\./\//g')
 result=$(python -m ir_measures $irds_tag $output_dir/${DATASET}.trec nDCG@10)
 
-short_name=$(basename "$irds_tag" | cut -c1-3)
+short_name=$(basename "$DATASET" | cut -c6-8)
 echo "${short_name} | $result"

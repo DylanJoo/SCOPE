@@ -15,7 +15,7 @@ conda activate inference
 # module load anaconda3/2024.2 # grid
 # conda activate crc
 
-model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4
+model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4.tau0.01
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
 mkdir -p $output_dir
 

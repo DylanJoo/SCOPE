@@ -35,23 +35,23 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-echo Encoding $DATASET corpus
-python -m tevatron.retriever.driver.encode \
-    --output_dir=temp \
-    --model_name_or_path meta-llama/Llama-3.1-8B-Instruct \
-    --lora_name_or_path $model_dir \
-    --lora \
-    --bf16 \
-    --per_device_eval_batch_size 32 \
-    --normalize \
-    --pooling last \
-    --passage_prefix "passage: " \
-    --append_eos_token \
-    --passage_max_len 512 \
-    --exclude_title \
-    --dataset_name DylanJHJ/beir-subset-corpus \
-    --dataset_split $DATASET \
-    --encode_output_path $output_dir/corpus_emb.${DATASET}.pkl
+# echo Encoding $DATASET corpus
+# python -m tevatron.retriever.driver.encode \
+#     --output_dir=temp \
+#     --model_name_or_path meta-llama/Llama-3.1-8B-Instruct \
+#     --lora_name_or_path $model_dir \
+#     --lora \
+#     --bf16 \
+#     --per_device_eval_batch_size 32 \
+#     --normalize \
+#     --pooling last \
+#     --passage_prefix "passage: " \
+#     --append_eos_token \
+#     --passage_max_len 512 \
+#     --exclude_title \
+#     --dataset_name DylanJHJ/beir-subset-corpus \
+#     --dataset_split $DATASET \
+#     --encode_output_path $output_dir/corpus_emb.${DATASET}.pkl
 
 echo Encoding $DATASET queries
 python -m tevatron.retriever.driver.encode \

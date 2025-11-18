@@ -15,9 +15,9 @@ conda activate inference
 # module load anaconda3/2024.2 # grid
 # conda activate crc
 
-model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4
+model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4.tau0.01
 output_dir=${HOME}/indices/nano-beir-corpus/${model_dir##*/}
-model_dir=${model_dir}/checkpoint-20000
+model_dir=${model_dir}/checkpoint-25000
 mkdir -p $output_dir
 
 DATASETS=(
@@ -34,7 +34,6 @@ DATASETS=(
 "nano_beir.scifact"
 "nano_beir.webis_touche2020"
 )
-# "nano_beir.msmarco"
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
 echo Encoding $DATASET ...
