@@ -1,21 +1,23 @@
 #!/bin/bash -l
 #SBATCH --job-name=encode
-#SBATCH --output=logs/encode.out.%a
-#SBATCH --error=logs/encode.err.%a
+#SBATCH --output=logs/encode2.out.%a
+#SBATCH --error=logs/encode2.err.%a
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
-#SBATCH --array=0-12%2
-#SBATCH --mem=32G
+#SBATCH --array=1,2,3,5%2
+#SBATCH --nodelist=ilps-cn116
+#SBATCH --mem=64G
 #SBATCH --time=1-00:00:00
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference 
 
-model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4.tau0.01
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+model_dir=DylanJHJ/dpr.modernbert-base.msmarco-passage.25k
+corpus_name=beir-corpus
+output_dir=${HOME}/indices/${corpus_name}/${model_dir##*/}
 mkdir -p $output_dir
 
 DATASETS=(
@@ -40,11 +42,11 @@ python -m tevatron.retriever.driver.encode \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --per_device_eval_batch_size 128 \
+    --per_device_eval_batch_size 512 \
     --passage_max_len 512 \
     --pooling mean --normalize --bf16 \
     --exclude_title \
-    --dataset_name DylanJHJ/beir-subset-corpus \
+    --dataset_name DylanJHJ/${corpus_name} \
     --dataset_split $DATASET \
     --encode_output_path $output_dir/corpus_emb.${DATASET}.pkl
 
