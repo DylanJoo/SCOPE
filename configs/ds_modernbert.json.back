@@ -32,17 +32,6 @@
             "torch_adam": true
         }
     },
-
-    "scheduler": {
-        "type": "WarmupDecayLR",
-        "params": {
-            "warmup_min_lr": "auto",
-            "warmup_max_lr": "auto",
-            "warmup_num_steps": "auto",
-            "total_num_steps": "auto"
-        }
-    },
-
     "gradient_accumulation_steps": "auto",
     "gradient_clipping": "auto",
     "steps_per_print": 1000,
