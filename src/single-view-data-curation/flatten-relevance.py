@@ -1,3 +1,8 @@
+"""
+crux-researchy
+split='flatten': positive from document >= 4; negatives from document <= 1
+split='flatten.pos_5.neg_1': positive from document >= 4; negatives from document <= 1
+"""
 import os
 from tqdm import tqdm 
 import argparse
@@ -9,6 +14,7 @@ from crux.tools.researchy.ir_utils import load_topic, load_subtopics
 parser = argparse.ArgumentParser()
 parser.add_argument('--split', type=str, default='train', help='Dataset split to analyze')
 parser.add_argument('--tau', type=int, default=4, help='Threshold for answerable subtopics')
+parser.add_argument('--split_flatten', type=str, help='the name for the new split')
 args = parser.parse_args()
 
 # main
@@ -52,4 +58,5 @@ for qid in tqdm(run):
 ## Transform to dataset (other subset)
 dataset = Dataset.from_list(dataset_dict['flatten'])
 print(dataset)
-dataset.push_to_hub("DylanJHJ/crux-researchy", split='flatten')
+# dataset.push_to_hub("DylanJHJ/crux-researchy", split='flatten')
+dataset.push_to_hub("DylanJHJ/crux-researchy", split=args.split_flatten)
