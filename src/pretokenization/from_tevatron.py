@@ -1,4 +1,7 @@
+<<<<<<< Updated upstream
 import math
+=======
+>>>>>>> Stashed changes
 import gc
 from tqdm import tqdm
 from tevatron.retriever.dataset import TrainDataset
@@ -92,6 +95,7 @@ if __name__ == "__main__":
 
 		# Move the list
         hf_dataset = Dataset.from_list(hf_data)
+		del pt_dataset
         del hf_data
         gc.collect()
 
