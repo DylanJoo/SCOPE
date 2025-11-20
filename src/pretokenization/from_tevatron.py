@@ -10,10 +10,11 @@ from multiprocessing import Pool, cpu_count
 
 if __name__ == "__main__":
 
-    new_dataset_name = 'crux-researchy-flatten.bert-base-uncased.pretokenized'
+    # split = 'flatten'
+    split = 'flatten.pos_5.neg_1'
+    new_dataset_name = f'crux-researchy-{split}.modernbert-base.pretokenized'
     dataset_name = 'DylanJHJ/crux-researchy'
     corpus_name = 'DylanJHJ/crux-researchy-corpus'
-    split = 'flatten'
 
     # Load config
     data_args = DataArguments(
@@ -23,7 +24,7 @@ if __name__ == "__main__":
         corpus_name=corpus_name,
         train_group_size=8,
         query_max_len=32,
-        passage_max_len=512,
+        passage_max_len=2048,
         eval_dataset_name='DylanJHJ/Qrels',
         eval_dataset_split='msmarco_passage.trec_dl_2019',
         eval_corpus_name='Tevatron/msmarco-passage-corpus-new',
@@ -31,8 +32,8 @@ if __name__ == "__main__":
     )
 
     # Load tokenizer
-    # tokenizer = AutoTokenizer.from_pretrained('answerdotai/ModernBERT-base')
-    tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
+    tokenizer = AutoTokenizer.from_pretrained('answerdotai/ModernBERT-base')
+    # tokenizer = AutoTokenizer.from_pretrained('bert-base-uncased')
 
 	# Pre-tokenization
     def pretokenize_batched(example):
