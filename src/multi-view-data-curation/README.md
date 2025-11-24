@@ -1,4 +1,4 @@
-# Negative mining strategies
+# Sampling strategies
 
 We explore various negative mining strategies for enhancing model performance. 
 The scripts included in this directory implement different strategies for mining negatives:

@@ -110,8 +110,8 @@ for qid in tqdm(run):
             dataset_dict[tag].append({
                 'query_id': qid, 
                 'query_text': topic[str(qid)],
-                'positive_document_ids': positive_docs,
-                'negative_document_ids': negative_docs,
+                'positive_document_ids': list(set(positive_docs)),
+                'negative_document_ids': list(set(negative_docs)),
                 'answer': None,
                 'source': f'crux-researchy.tau:{tau}.clueweb22-B',
             })
