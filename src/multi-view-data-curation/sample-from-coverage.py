@@ -18,7 +18,7 @@ tau = args.tau
 
 topic = load_topic(split)
 subtopics = load_subtopics(split)
-CRUX_ROOT = (os.environ["CRUX_ROOT"] or '/exp/scale25/artifacts/crux')
+CRUX_ROOT = os.environ.get("CRUX_ROOT", '/exp/scale25/artifacts/crux')
 run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
@@ -35,7 +35,7 @@ for qid in tqdm(run):
     document_ids = {0.75: [], 0.5: [], 0.25: [], 0.0: [], -1: [], -2: []}
     for i, docid in enumerate(run[qid]):
         rating = (judge[qid][docid] or [0])
-        c = sum(np.array(rating) >= tau) / n_ans
+        c = sum(np.array(rating) >= tau) / n_ans if n_ans > 0 else 0
 
         if i < 20: # only include judged negative before 20
             for threshold in [0.75, 0.5, 0.25, 0.0]:
