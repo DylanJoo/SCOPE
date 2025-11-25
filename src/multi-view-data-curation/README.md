@@ -23,9 +23,9 @@ This script implements various positive/negative sampling strategies based on co
 
 Documents from the top 20 results are classified into buckets based on their coverage score `c`:
 - **high (0.75)**: c >= 0.75 (covers at least 75% of answerable subtopics)
-- **half (0.5)**: 0.5 <= c < 0.75 (covers 50-75% of answerable subtopics)
-- **quarter (0.25)**: 0.25 <= c < 0.5 (covers 25-50% of answerable subtopics)
-- **low (0.0)**: 0 <= c < 0.25 (covers less than 25% of answerable subtopics)
+- **half (0.5)**: 0.5 <= c < 0.75 (covers 50% to <75% of answerable subtopics)
+- **quarter (0.25)**: 0.25 <= c < 0.5 (covers 25% to <50% of answerable subtopics)
+- **low (0.0)**: 0 <= c < 0.25 (covers <25% of answerable subtopics)
 - **zero (-1)**: c == 0 exactly (covers no answerable subtopics)
 - **unjudged (-2)**: Documents ranked after position 50 (not judged)
 
