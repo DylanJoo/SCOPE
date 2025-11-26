@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.%j.out
-#SBATCH --error=logs/modernbert.%j.err
+#SBATCH --output=logs/modernbert.out
+#SBATCH --error=logs/modernbert.err
 #SBATCH --partition=small-g         # partition name
 #SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                   # Total number of nodes 
@@ -9,15 +9,15 @@
 #SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
 #SBATCH --mem=120G
 #SBATCH --time=2-00:00:00           # Run time (d-hh:mm:ss)
-#SBATCH --account=project_465001640 # Project for billing
+#SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
 bsz=64
 nsample=512
-lr=1e-5
-model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}.mean
+lr=1e-4
+model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
@@ -28,7 +28,7 @@ NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
 # Start experiments
 srun singularity exec $SIF \
     accelerate launch -m \
-    --multi_gpu \
+    --multi_gpu --mixed_precision=bf16 \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
     --exclude_title \
@@ -42,18 +42,20 @@ srun singularity exec $SIF \
     --prediction_loss_only True \
     --eval_strategy steps \
     --do_eval True \
+    --pooling mean --normalize \
     --eval_dataset_name DylanJHJ/Qrels \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
     --eval_group_size 8 \
-    --pooling mean \
+    --bf16 \
+    --temperature 0.02 \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
     --learning_rate $lr \
     --query_max_len 32 \
     --passage_max_len 196 \
-    --dataloader_num_workers 2 \
+    --dataloader_num_workers 8 \
     --max_steps 25000 \
     --warmup_steps 2500 \
     --logging_steps 10 \
     --overwrite_output_dir \
-    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}.mean
+    --run_name modernbert-base.msmarco-passage.b${bsz}_n${nsample}.${lr}

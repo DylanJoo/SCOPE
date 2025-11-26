@@ -79,6 +79,7 @@ for qid in tqdm(run):
         ('high', 'half'),
         ('half', 'zero'),
         ('low', 'zero'),
+        ('zero', 'high'),
     ]:
         tag = f"pos_{positive_category}.neg_{negative_category}"
         if tag not in dataset_dict:
@@ -91,6 +92,8 @@ for qid in tqdm(run):
             positive_docs += document_ids[0.5]
         if positive_category == 'low':
             positive_docs += document_ids[0.0]
+        if positive_category == 'zero':
+            positive_docs += document_ids[-1]
 
         negative_docs = []
         if negative_category == 'zero':
@@ -101,6 +104,8 @@ for qid in tqdm(run):
             negative_docs += document_ids[0.25] + document_ids[0.0]
         if negative_category == 'half':
             negative_docs += document_ids[0.5] + document_ids[0.25] + document_ids[0.0]
+        if negative_category == 'high':
+            negative_docs += document_ids[0.75]
 
         ## remove redundant
         positive_docs = list(set(positive_docs))
@@ -127,6 +132,6 @@ if args.overwrite:
     dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
     dataset.push_to_hub("DylanJHJ/crux-researchy")
 else:
-    dataset = Dataset.from_list( dataset_dict['pos_low.neg_zero'] )
+    dataset = Dataset.from_list( dataset_dict['pos_zero.neg_high'] )
     print(dataset)
-    dataset.push_to_hub("DylanJHJ/crux-researchy", split='pos_low.neg_zero')
+    dataset.push_to_hub("DylanJHJ/crux-researchy", split='pos_zero.neg_high')

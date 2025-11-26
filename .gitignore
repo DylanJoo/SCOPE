@@ -10,6 +10,7 @@ slurm/qwen3
 slurm/search*
 core
 
-eval.*/result*
+eval*/result*
+eval*/**/result*
 
 runs

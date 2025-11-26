@@ -1,3 +1,0 @@
-model: /users/judylan1/models/bert-crux-researchy.b32_n256.1e-5.25k.train
-nDCG@10	0.4326
-nDCG@10	0.3883

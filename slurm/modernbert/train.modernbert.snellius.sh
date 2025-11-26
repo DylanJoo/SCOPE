@@ -47,7 +47,7 @@ accelerate launch -m \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
     --eval_group_size 8 \
     --bf16 \
-    --temperature 0.01 \
+    --temperature 0.02 \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
     --learning_rate $lr \
