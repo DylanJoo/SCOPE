@@ -1,64 +1,63 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/train.out.%j
-#SBATCH --error=logs/train.err.%j
-#SBATCH --partition=small-g         # partition name
-#SBATCH --ntasks-per-node=1         # 8 MPI ranks per node, 16 total (2x8)
+#SBATCH --output=logs/bert.out
+#SBATCH --error=logs/bert.err
+#SBATCH --partition=small-g
+#SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
-#SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
-#SBATCH --mem=120G
-#SBATCH --time=3-00:00:00           # Run time (d-hh:mm:ss)
-#SBATCH --account=project_465001640 # Project for billing
+#SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
+#SBATCH --mem=256G
+#SBATCH --time=2-00:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
 bsz=64
-nsample=256
+nsample=512
 lr=1e-5
 split=flatten
-model_dir=${HOME}/models/bert-crux-researchy.${bsz}_n${nsample}.${lr}.${split}
-pretrained=bert-base-uncased
+model_dir=${HOME}/models/bert-crux-researchy-${split}.${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
-GPUS_PER_NODE=2
+GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
 
 # Start experiments
 srun singularity exec $SIF \
     accelerate launch -m \
-    --multi_gpu \
+    --multi_gpu --mixed_precision=bf16 \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
     tevatron.retriever.driver.train \
     --exclude_title \
     --output_dir ${model_dir} \
-    --model_name_or_path $pretrained \
+    --model_name_or_path bert-base-uncased \
     --save_steps 10000 \
     --dataset_name DylanJHJ/crux-researchy \
-    --dataset_split $split \
     --corpus_name DylanJHJ/crux-researchy-corpus \
+    --dataset_split $split \
     --per_device_train_batch_size 16 \
     --train_group_size 8 \
     --prediction_loss_only True \
-    --eval_strategy steps \
     --do_eval True \
+    --eval_strategy steps \
     --eval_dataset_name DylanJHJ/Qrels \
     --eval_dataset_split msmarco_passage.trec_dl_2019 \
     --eval_corpus_name Tevatron/msmarco-passage-corpus-new \
     --eval_group_size 8 \
     --per_device_eval_batch_size 64 \
     --eval_steps 100 \
+    --bf16 \
     --learning_rate $lr \
     --query_max_len 32 \
     --passage_max_len 512 \
-    --dataloader_num_workers 2 \
+    --dataloader_num_workers 4 \
     --max_steps 50000 \
     --warmup_steps 5000 \
     --logging_steps 10 \
     --attn_implementation sdpa \
-    --gradient_accumulation_steps 2 \
     --overwrite_output_dir \
-    --run_name bert-base.crux-researchy.b${bsz}_n${nsample}.${lr}.${split}
+    --run_name bert-base.crux-researchy-${split}.b${bsz}_n${nsample}.${lr}
