@@ -6,14 +6,14 @@
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
-#SBATCH --array=1,3,5%2
+#SBATCH --array=0-12%2
 #SBATCH --nodelist=ilps-cn116
 #SBATCH --mem=64G
 #SBATCH --time=1-00:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
-conda activate inference 
+source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
+conda activate inference
 
 model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 corpus_name=beir-corpus
@@ -51,15 +51,15 @@ python -m tevatron.retriever.driver.encode \
     --attn_implementation sdpa \
     --bf16 
 
-# echo Encoding $DATASET queries
-# python -m tevatron.retriever.driver.encode \
-#     --output_dir=temp \
-#     --tokenizer_name bert-base-uncased \
-#     --model_name_or_path $model_dir \
-#     --per_device_eval_batch_size 64 \
-#     --dataset_name DylanJHJ/beir-subset \
-#     --dataset_split $DATASET \
-#     --attn_implementation sdpa \
-#     --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
-#     --query_max_len 256 \
-#     --encode_is_query
+echo Encoding $DATASET queries
+python -m tevatron.retriever.driver.encode \
+    --output_dir=temp \
+    --tokenizer_name bert-base-uncased \
+    --model_name_or_path $model_dir \
+    --per_device_eval_batch_size 64 \
+    --dataset_name DylanJHJ/beir-subset \
+    --dataset_split $DATASET \
+    --attn_implementation sdpa \
+    --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
+    --query_max_len 256 \
+    --encode_is_query
