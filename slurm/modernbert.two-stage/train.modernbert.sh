@@ -1,14 +1,14 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.out
-#SBATCH --error=logs/modernbert.err
+#SBATCH --output=logs/modernbert.outw2
+#SBATCH --error=logs/modernbert.errw2
 #SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
 #SBATCH --mem=256G
-#SBATCH --time=2-00:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
@@ -17,9 +17,12 @@ module use /appl/local/training/modules/AI-20241126/
 bsz=64
 nsample=512
 lr=1e-4
-split=flatten.pos_5.neg_1
+split=pos_20.neg_51.filtered
 max_length=512
-model_dir=${HOME}/models/modernbert-crux-researchy-${split}.${bsz}_n${nsample}.${lr}.${max_length}
+model_dir=${HOME}/models/modernbert-two-stage.${split}.b${bsz}_n${nsample}.${lr}.${max_length}.self-prefinetuned
+
+prefinetuned=DylanJHJ/dpr.modernbert-base.msmarco-passage.25k
+prefinetuned=DylanJHJ/dpr.modernbert-base.crux-researchy-flatten.25k
 
 mkdir -p ${model_dir}
 
@@ -35,8 +38,8 @@ srun singularity exec $SIF \
     tevatron.retriever.driver.train \
     --exclude_title \
     --output_dir ${model_dir} \
-    --model_name_or_path answerdotai/ModernBERT-base \
-    --save_steps 5000 \
+    --model_name_or_path $prefinetuned \
+    --save_steps 2500 \
     --dataset_name DylanJHJ/crux-researchy \
     --corpus_name DylanJHJ/crux-researchy-corpus \
     --dataset_split $split \
@@ -58,8 +61,8 @@ srun singularity exec $SIF \
     --query_max_len 32 \
     --passage_max_len $max_length \
     --dataloader_num_workers 4 \
-    --max_steps 25000 \
-    --warmup_steps 2500 \
+    --max_steps 10000 \
+    --warmup_steps 1000 \
     --logging_steps 10 \
     --overwrite_output_dir \
-    --run_name modernbert-base.crux-researchy-${split}.b${bsz}_n${nsample}.${lr}.${max_length}
+    --run_name modernbert-base.two-stage.${split}.b${bsz}_n${nsample}.${lr}.${max_length}

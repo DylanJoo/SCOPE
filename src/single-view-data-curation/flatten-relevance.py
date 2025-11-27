@@ -1,7 +1,7 @@
 """
 crux-researchy
-split='flatten': positive from document >= 4; negatives from document <= 1
-split='flatten.pos_5.neg_1': positive from document >= 4; negatives from document <= 1
+split='flatten.pos_4.neg_1': positive from document >= 4; negatives from document <= 1
+split='flatten.pos_5.neg_1': positive from document >= 5; negatives from document <= 1
 """
 import os
 from tqdm import tqdm 
@@ -41,10 +41,9 @@ for qid in tqdm(run):
         negative_docs = [docid for docid in judge[qid] if judge[qid][docid][i] <= 1]
 
         if len(positive_docs) >= 1:
-            negative_docs_unjudged = [docid for docid in run[qid]][51:(81 - len(negative_docs))]
+            negative_docs_unjudged = [docid for docid in run[qid]][51:(67 - len(negative_docs))]
             negative_docs += negative_docs_unjudged # add unjudged documents
 
-            document_ids_all = [docid for docid in run[qid]]
             dataset_dict['flatten'].append({
                 'query_id': f"{qid}#{i}",
                 'query_text': subtopic,
@@ -58,5 +57,4 @@ for qid in tqdm(run):
 ## Transform to dataset (other subset)
 dataset = Dataset.from_list(dataset_dict['flatten'])
 print(dataset)
-# dataset.push_to_hub("DylanJHJ/crux-researchy", split='flatten')
 dataset.push_to_hub("DylanJHJ/crux-researchy", split=args.split_flatten)
