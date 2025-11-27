@@ -1,17 +1,18 @@
 #!/bin/bash -l
 #SBATCH --job-name=search
-#SBATCH --output=search.out
+#SBATCH --output=result.out
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=32
 #SBATCH --mem=32G
-#SBATCH --time=0-00:30:00         # Run time (d-hh:mm:ss)
+#SBATCH --time=00:30:00
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
-conda activate ir
+conda activate inference
 
-crux_root=${HOME}/datasets/crux
+CRUX_ROOT=${HOME}/datasets/crux
+
 model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
@@ -34,7 +35,7 @@ done
 for subset in crux-mds-duc04 crux-mds-multi_news;do
     python -m crux.evaluation.rac_eval \
         --run $output_dir/$subset.trec \
-        --qrel $crux_root/$subset/qrels/div_qrels-tau3.txt \
+        --qrel $CRUX_ROOT/$subset/qrels/div_qrels-tau3.txt \
         --filter_by_oracle \
-        --judge $crux_root/$subset/judge/ratings.Llama-3.1-70B-Instruct.0-1.jsonl
+        --judge $CRUX_ROOT/$subset/judge 
 done

@@ -2,7 +2,7 @@
 #SBATCH --job-name=encode
 #SBATCH --output=enc-doc.out.%j
 #SBATCH --error=enc-doc.err.%j
-#SBATCH --partition=gpu 
+#SBATCH --partition=gpu
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                

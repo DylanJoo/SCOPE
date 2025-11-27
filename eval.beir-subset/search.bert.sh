@@ -5,8 +5,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
-#SBATCH --array=0-12%1
-#SBATCH --mem=32G
+#SBATCH --array=3%12
+#SBATCH --mem=48G
 #SBATCH --time=00:30:00
 
 # ENV
@@ -16,7 +16,7 @@ conda activate inference
 # conda activate crc
 
 model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
 DATASETS=(

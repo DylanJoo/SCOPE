@@ -5,18 +5,16 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
-#SBATCH --array=0-12%1
+#SBATCH --array=0-12%4
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference
-# module load anaconda3/2024.2 # grid
-# conda activate crc
 
-model_dir=${HOME}/models/crux-research-train-series/modernbert-msmarco-psg.b64_n512.1e-4.tau0.01
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+model_dir=DylanJHJ/dpr.modernbert-base.msmarco-passage.25k
+output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
 DATASETS=(
