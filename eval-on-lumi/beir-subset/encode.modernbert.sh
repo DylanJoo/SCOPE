@@ -7,7 +7,7 @@
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1           # Allocate one gpu per MPI rank
-#SBATCH --array=0-12%13
+#SBATCH --array=0-13%13
 #SBATCH --mem=64G
 #SBATCH --time=00:30:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
@@ -19,10 +19,9 @@ module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
 pooling=mean
-model_dir=${HOME}/models/modernbert-crux-researchy-pos_20.neg_51.filtered.b32_n256.1e-4.1024
-# model_dir=${HOME}/models/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
+model_dir=${HOME}/models/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
-model_dir=${model_dir}/checkpoint-10000
+model_dir=${model_dir}/checkpoint-30000
 mkdir -p $output_dir
 
 DATASETS=(
@@ -48,7 +47,7 @@ singularity exec $SIF  \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --per_device_eval_batch_size 768 \
+    --per_device_eval_batch_size 512 \
     --passage_max_len 512 \
     --pooling $pooling --normalize --bf16 \
     --exclude_title \

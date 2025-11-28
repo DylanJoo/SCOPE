@@ -16,8 +16,7 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-model_dir=${HOME}/models/modernbert-crux-researchy-pos_20.neg_51.filtered.b32_n256.1e-4.1024
-# model_dir=${HOME}/models/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
+model_dir=${HOME}/models/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
