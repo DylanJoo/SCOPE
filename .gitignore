@@ -5,6 +5,9 @@ wandb/
 **/**out*
 **/**err*
 **/**.swp
+__pycache__/
+**/__pycache__/
+*.pyc
 
 slurm/qwen3
 slurm/search*
