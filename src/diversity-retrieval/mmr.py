@@ -12,6 +12,21 @@ from typing import Dict, List, Tuple, Optional
 from utils import cosine_similarity, min_max_normalize
 
 
+def normalize_embeddings(embeddings: np.ndarray) -> np.ndarray:
+    """
+    L2-normalize embeddings, handling zero vectors.
+    
+    Args:
+        embeddings: 2D array of embeddings (n_docs x dim).
+        
+    Returns:
+        Normalized embeddings with same shape.
+    """
+    norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
+    norms = np.where(norms == 0, 1, norms)
+    return embeddings / norms
+
+
 def mmr_rerank(
     query_emb: np.ndarray,
     doc_ids: List[str],
@@ -41,6 +56,9 @@ def mmr_rerank(
     
     top_k = min(top_k, n_docs)
     
+    # Normalize document embeddings once
+    docs_normalized = normalize_embeddings(doc_embs)
+    
     # Compute relevance scores if not provided
     if doc_scores is None:
         query_norm = np.linalg.norm(query_emb)
@@ -48,10 +66,6 @@ def mmr_rerank(
             query_normalized = query_emb / query_norm
         else:
             query_normalized = query_emb
-            
-        doc_norms = np.linalg.norm(doc_embs, axis=1, keepdims=True)
-        doc_norms = np.where(doc_norms == 0, 1, doc_norms)
-        docs_normalized = doc_embs / doc_norms
         
         relevance_scores = docs_normalized @ query_normalized
     else:
@@ -60,10 +74,7 @@ def mmr_rerank(
     # Normalize relevance scores to [0, 1]
     relevance_scores = min_max_normalize(relevance_scores)
     
-    # Precompute document similarity matrix
-    doc_norms = np.linalg.norm(doc_embs, axis=1, keepdims=True)
-    doc_norms = np.where(doc_norms == 0, 1, doc_norms)
-    docs_normalized = doc_embs / doc_norms
+    # Precompute document similarity matrix using already normalized embeddings
     doc_sim_matrix = docs_normalized @ docs_normalized.T
     
     # MMR selection

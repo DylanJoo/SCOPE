@@ -14,6 +14,11 @@ from typing import Dict, List, Tuple, Optional
 from collections import defaultdict
 
 
+def get_uniform_weight(n_subqueries: int) -> float:
+    """Get uniform weight for a given number of sub-queries."""
+    return 1.0 / n_subqueries if n_subqueries > 0 else 0.0
+
+
 def lancer_score_aggregation(
     subquery_scores: Dict[str, Dict[str, float]],
     weights: Optional[Dict[str, float]] = None,
@@ -36,10 +41,11 @@ def lancer_score_aggregation(
         return {}
     
     n_subqueries = len(subquery_scores)
+    uniform_weight = get_uniform_weight(n_subqueries)
     
     # Set uniform weights if not provided
     if weights is None:
-        weights = {sq_id: 1.0 / n_subqueries for sq_id in subquery_scores}
+        weights = {sq_id: uniform_weight for sq_id in subquery_scores}
     
     # Normalize weights to sum to 1
     weight_sum = sum(weights.values())
@@ -80,7 +86,7 @@ def lancer_score_aggregation(
         
         for sq_id in normalized_scores:
             if docid in normalized_scores[sq_id]:
-                score = normalized_scores[sq_id][docid] * weights.get(sq_id, 1.0 / n_subqueries)
+                score = normalized_scores[sq_id][docid] * weights.get(sq_id, uniform_weight)
                 weighted_sum += score
                 doc_scores_list.append(normalized_scores[sq_id][docid])
         

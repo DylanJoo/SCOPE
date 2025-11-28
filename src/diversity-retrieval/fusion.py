@@ -54,16 +54,16 @@ def round_robin_fusion(
                 docid, score = ranklist[ptr]
                 pointers[sq_id] = ptr + 1
                 
+                # Score based on position in fused list
+                fused_score = 1.0 / (len(results) + 1)
+                
                 if skip_duplicates:
                     if docid not in seen_docs:
                         seen_docs.add(docid)
-                        # Score based on position in fused list
-                        fused_score = 1.0 / (len(results) + 1)
                         results.append((docid, fused_score))
                         made_progress = True
                         break
                 else:
-                    fused_score = 1.0 / (len(results) + 1)
                     results.append((docid, fused_score))
                     made_progress = True
                     break

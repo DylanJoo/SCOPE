@@ -10,8 +10,8 @@ Implements the following strategies:
 5. Score summation with min-max normalization (LANCER-style)
 
 Usage:
-    python run_diversity_retrieval.py --method mmr --lambda_param 0.5 \\
-        --query_emb query_emb.pkl --corpus_emb corpus_emb.pkl \\
+    python run_diversity_retrieval.py --method mmr --lambda_param 0.5 \
+        --query_emb query_emb.pkl --corpus_emb corpus_emb.pkl \
         --run input.trec --output output.trec
 """
 
@@ -76,8 +76,8 @@ def main():
                         help="Alpha parameter for LANCER (weight for main query)")
     parser.add_argument("--k", type=int, default=60,
                         help="K parameter for RRF")
-    parser.add_argument("--normalize", action="store_true", default=True,
-                        help="Apply min-max normalization")
+    parser.add_argument("--no_normalize", action="store_true",
+                        help="Disable min-max normalization (enabled by default)")
     parser.add_argument("--top_k", type=int, default=100,
                         help="Number of documents to return per query")
     
@@ -134,7 +134,7 @@ def main():
             method=args.method,
             top_k=args.top_k,
             k=args.k,
-            normalize=args.normalize
+            normalize=not args.no_normalize
         )
         
         run_name = args.method
@@ -153,7 +153,7 @@ def main():
             main_run=run,
             subquery_runs=subquery_runs,
             alpha=args.alpha,
-            normalize=args.normalize,
+            normalize=not args.no_normalize,
             top_k=args.top_k
         )
         

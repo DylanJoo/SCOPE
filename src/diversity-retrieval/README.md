@@ -74,9 +74,10 @@ python run_diversity_retrieval.py \
     --subquery_run path/to/subquery_runs.pkl \
     --run input.trec \
     --output output.score_sum.trec \
-    --normalize \
     --top_k 100
 ```
+
+Note: Min-max normalization is enabled by default. Use `--no_normalize` to disable.
 
 ### LANCER
 ```bash
