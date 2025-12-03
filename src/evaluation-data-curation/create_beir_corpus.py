@@ -1,6 +1,6 @@
 import os
 import ir_datasets
-from datasets import DatasetDict, Dataset
+from datasets import DatasetDict, Dataset, load_dataset
 
 dataset_dict = {}
 home_dir = os.path.expanduser("~/")
@@ -33,14 +33,15 @@ for split in split_names:
     for doc in d.docs_iter():
         docid = doc.doc_id
         doctext = doc.text
-        document[docid] = doctext
+        doctitle = getattr(doc, 'title', '')
+        document[docid] = (doctitle, doctext)
 
     dataset_dict[split] = []
     for docid in document:
         dataset_dict[split].append({
             'docid': docid,
-            'title': "",
-            'text': document[docid],
+            'title': document[docid][0],
+            'text': document[docid][1],
             'source': 'beir',
         })
 
@@ -48,3 +49,5 @@ for split in split_names:
 ## Transform to dataset
 dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
 dataset.push_to_hub("DylanJHJ/beir-corpus")
+
+load_dataset("DylanJHJ/beir-corpus")
