@@ -7,22 +7,14 @@
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1           # Allocate one gpu per MPI rank
-#SBATCH --array=0-13%13
+#SBATCH --array=10%13
 #SBATCH --mem=64G
-#SBATCH --time=00:30:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=01:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 # ENV
-# source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
-# conda activate inference 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
-
-pooling=mean
-model_dir=${HOME}/models/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
-model_dir=${model_dir}/checkpoint-30000
-mkdir -p $output_dir
 
 DATASETS=(
 "beir.arguana"
@@ -41,16 +33,21 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
+for model_dir in ${HOME}/models/ablation.two-stage/modernbert-two-stage-*;do
+output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+mkdir -p $output_dir
+
 echo Encoding $DATASET corpus
 singularity exec $SIF  \
     python -m tevatron.retriever.driver.encode \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --per_device_eval_batch_size 512 \
+    --per_device_eval_batch_size 2048 \
     --passage_max_len 512 \
-    --pooling $pooling --normalize --bf16 \
     --exclude_title \
+    --pooling mean --normalize \
+    --passage_prefix "search_document: " \
     --dataset_name DylanJHJ/beir-subset-corpus \
     --dataset_split $DATASET \
     --encode_output_path $output_dir/corpus_emb.${DATASET}.pkl
@@ -61,10 +58,13 @@ singularity exec $SIF  \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --pooling $pooling --normalize --bf16 \
+    --pooling mean --normalize \
     --per_device_eval_batch_size 128 \
     --dataset_name  DylanJHJ/beir-subset \
     --dataset_split $DATASET \
+    --query_prefix "search_query: " \
     --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
     --query_max_len 256 \
     --encode_is_query
+
+done

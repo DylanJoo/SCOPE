@@ -11,12 +11,18 @@
 #SBATCH --account=project_465001640 # Project for billing
 
 # ENV
-# source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
-# conda activate inference
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-model_dir=${HOME}/models/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4
+model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy
+# model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
@@ -37,6 +43,15 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
+singularity exec $SIF  \
+    python -m tevatron.retriever.driver.search \
+    --query_reps $output_dir/query_emb.${DATASET}.pkl \
+    --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
+    --depth 100 \
+    --batch_size -1 \
+    --save_text \
+    --save_ranking_to $output_dir/${DATASET}.run
+
 QRELS=(
 "beir/arguana"
 "beir/climate-fever"
@@ -52,15 +67,6 @@ QRELS=(
 "beir/trec-covid"
 "beir/webis-touche2020/v2"
 )
-singularity exec $SIF  \
-    python -m tevatron.retriever.driver.search \
-    --query_reps $output_dir/query_emb.${DATASET}.pkl \
-    --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
-    --depth 100 \
-    --batch_size -1 \
-    --save_text \
-    --save_ranking_to $output_dir/${DATASET}.run
-
 singularity exec $SIF  \
     python -m tevatron.utils.format.convert_result_to_trec \
     --input $output_dir/${DATASET}.run \
