@@ -1,14 +1,14 @@
 #!/bin/bash -l
-#SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.out
-#SBATCH --error=logs/modernbert.err
+#SBATCH --job-name=train-kd
+#SBATCH --output=logs/modernbert.outkd
+#SBATCH --error=logs/modernbert.errkd
 #SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
 #SBATCH --mem=128G
-#SBATCH --time=24:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
@@ -18,7 +18,7 @@ export TOKENIZERS_PARALLELISM=false
 bsz=64
 nsample=512
 lr=1e-4
-model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}
+model_dir=${HOME}/models/modernbert-msmarco-psg-kd.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
@@ -32,19 +32,17 @@ srun singularity exec $SIF \
     accelerate launch -m \
     --multi_gpu --mixed_precision=bf16 \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
-    tevatron.retriever.driver.train_dev \
+    tevatron.retriever.driver.train_distil_dev \
     --exclude_title \
     --output_dir ${model_dir} \
     --model_name_or_path $PRETRAINED \
     --save_steps 5000 \
-    --dataset_name Tevatron/msmarco-passage-new \
+    --dataset_name DylanJHJ/msmarco-passage-new-qwen3-0.6b-rerank \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
     --per_device_train_batch_size 32 \
     --train_group_size 8 \
     --prediction_loss_only True \
     --bf16 --pooling mean --normalize \
-    --passage_prefix "search_document: " \
-    --query_prefix "search_query: " \
     --temperature 0.02 \
     --eval_steps 1000 \
     --learning_rate $lr \
@@ -53,8 +51,8 @@ srun singularity exec $SIF \
     --dataloader_num_workers 4 \
     --lr_scheduler_type 'cosine' \
     --weight_decay 0.01 \
-    --max_steps 10000 \
-    --warmup_steps 1000 \
+    --max_steps 25000 \
+    --warmup_steps 2500 \
     --logging_steps 10 \
     --overwrite_output_dir \
     --run_name ${model_dir##*/}

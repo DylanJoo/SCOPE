@@ -1,28 +1,28 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.out
-#SBATCH --error=logs/modernbert.err
+#SBATCH --output=logs/modernbert.outs
+#SBATCH --error=logs/modernbert.errs
 #SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
-#SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
-#SBATCH --mem=128G
-#SBATCH --time=24:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --gpus-per-node=8           # Allocate one gpu per MPI rank
+#SBATCH --mem=256G
+#SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 export TOKENIZERS_PARALLELISM=false
 
-bsz=64
-nsample=512
+bsz=256
+nsample=2048
 lr=1e-4
 model_dir=${HOME}/models/modernbert-msmarco-psg.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
-GPUS_PER_NODE=2
+GPUS_PER_NODE=8
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
 PRETRAINED=nomic-ai/modernbert-embed-base-unsupervised
@@ -40,7 +40,7 @@ srun singularity exec $SIF \
     --dataset_name Tevatron/msmarco-passage-new \
     --corpus_name Tevatron/msmarco-passage-corpus-new \
     --per_device_train_batch_size 32 \
-    --train_group_size 8 \
+    --train_group_size 16 \
     --prediction_loss_only True \
     --bf16 --pooling mean --normalize \
     --passage_prefix "search_document: " \

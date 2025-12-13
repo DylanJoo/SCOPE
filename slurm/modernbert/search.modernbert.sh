@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=search
-#SBATCH --output=search.out
-#SBATCH --error=search.err
+#SBATCH --output=result.out
+#SBATCH --error=result.err
 #SBATCH --partition=debug           # partition name
 #SBATCH --ntasks-per-node=1       # 8 MPI ranks per node, 16 total (2x8)
 #SBATCH --nodes=1                 # Total number of nodes 
@@ -10,8 +10,8 @@
 #SBATCH --time=0-00:30:00         # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465001640 # Project for billing
 
-model_dir=${HOME}/models/modernbert-msmarco-psg.b64_n512.5e-6.norm
-checkpoint=checkpoint-20000
+model_dir=${HOME}/models/modernbert-msmarco-psg.b64_n512.1e-4
+checkpoint=checkpoint-25000
 output_dir=${HOME}/indices/${model_dir##*/}
 
 echo model: $model_dir, checkpoint: $checkpoint

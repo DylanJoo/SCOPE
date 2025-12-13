@@ -1,6 +1,5 @@
 """
 crux-researchy
-split='flatten.pos_4.neg_1': positive from document >= 4; negatives from document <= 1
 split='flatten.pos_5.neg_1': positive from document >= 5; negatives from document <= 1
 """
 import os
