@@ -9,7 +9,7 @@ for subset in ['duc04', 'multi_news']:
     # filter the unused subtopics
     subtopics = {k: v for k, v in subtopics.items() if k in topics}
 
-    with open(f'crux-mds-{subset}.subquestions.jsonl', 'w') as f_out:
+    with open(f'crux-mds-{subset}.oracle.subquestions.jsonl', 'w') as f_out:
         for topic_id, subtopic_list in subtopics.items():
             for i, subtopic in enumerate(subtopic_list):
                 entry = {
