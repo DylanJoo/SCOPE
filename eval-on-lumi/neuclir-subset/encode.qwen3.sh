@@ -17,19 +17,7 @@ module use /appl/local/training/modules/AI-20241126/
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"nomic-ai/modernbert-embed-base"
-# "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
-# "DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k"
-# "nomic-ai/modernbert-embed-base-unsupervised"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4"
-# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy"
-# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
+"Qwen/Qwen3-Embedding-8B"
 )
 
 for model_dir in "${MODEL_DIRS[@]}"; do
@@ -41,10 +29,13 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --output_dir=temp \
         --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
-        --per_device_eval_batch_size 256 \
-        --passage_max_len 1024 \
+        --per_device_eval_batch_size 64 \
+        --bf16 \
+        --normalize \
+        --pooling last \
+        --padding_side left \
         --passage_prefix "search_document: " \
-        --pooling mean --bf16 --normalize \
+        --passage_max_len 1024 \
         --dataset_name DylanJHJ/neuclir1-subset-corpus  \
         --encode_output_path $output_dir/corpus_emb.pkl
 
@@ -54,11 +45,16 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --output_dir=temp \
         --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
-        --pooling mean --bf16 --normalize \
+        --bf16 \
+        --normalize \
+        --pooling last \
+        --padding_side left \
         --per_device_eval_batch_size 64 \
-        --query_prefix "search_query: " \
+        --query_prefix "Instruct: Given a web search query, retrieve relevant passages that provide context to the query.\nQuery:" \
         --dataset_path $topic_path \
         --encode_output_path $output_dir/query_emb.pkl \
         --query_max_len 256 \
         --encode_is_query
+        # --query_prefix "Instruct: Given a report request, retrieve relevant passages that provide context to the report.\nRequest:" \
 done
+

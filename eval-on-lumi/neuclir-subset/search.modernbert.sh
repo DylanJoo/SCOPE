@@ -17,15 +17,19 @@ source ${HOME}/temp/venv/crux/bin/activate
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
-"nomic-ai/modernbert-embed-base-unsupervised"
-"modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4"
-"modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4"
+"nomic-ai/modernbert-embed-base"
+# "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
+# "DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k"
+# "nomic-ai/modernbert-embed-base-unsupervised"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4"
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4"
+"${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy"
+"${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
 )
 
 for model_dir in "${MODEL_DIRS[@]}"; do
