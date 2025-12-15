@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=encode
-#SBATCH --output=logs/encode2.out.%a
-#SBATCH --error=logs/encode2.err.%a
+#SBATCH --output=logs/encode3.out.%a
+#SBATCH --error=logs/encode3.err.%a
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
@@ -16,6 +16,7 @@ conda activate inference
 model_dir=nomic-ai/modernbert-embed-base-unsupervised
 model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
 model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco
+model_dir=${HOME}/models/ablation.cov-samping/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4
 output_dir=${HOME}/indices/neuclir1/${model_dir##*/}
 mkdir -p $output_dir
 
@@ -34,6 +35,7 @@ for shard_idx in 0 1;do
         --model_name_or_path $model_dir \
         --per_device_eval_batch_size 1024 \
         --pooling mean --bf16 --normalize \
+        --passage_prefix "search_document: " \
         --passage_max_len 1024 \
         --dataset_path ${HOME}/datasets/neuclir1/${LANG}.processed_output.jsonl.gz \
         --encode_output_path $output_dir/corpus_emb.${LANG}-${shard_idx}.pkl \
@@ -49,6 +51,7 @@ if [[ $LANG -eq "rus" ]]; then
         --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
         --pooling mean --normalize --bf16 \
+        --query_prefix "search_query: " \
         --per_device_eval_batch_size 64 \
         --dataset_path $topic_path \
         --encode_output_path $output_dir/query_emb.pkl \

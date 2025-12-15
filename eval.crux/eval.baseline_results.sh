@@ -14,7 +14,7 @@ conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux
 
-for baseline in /home/dju/indices/neuclir1/baselines/*mds-duc04*.run;do
+for baseline in ${HOME}/crux/runs/*mds-duc04.trec;do
     echo $baseline
     python -m crux.evaluation.rac_eval \
         --run $baseline \
@@ -23,11 +23,11 @@ for baseline in /home/dju/indices/neuclir1/baselines/*mds-duc04*.run;do
         --judge $CRUX_ROOT/crux-mds-duc04/judge 
 done
 
-# for baseline in /home/dju/indices/neuclir1/baselines/*mds-multi_news*.run;do
-#     echo $baseline
-#     python -m crux.evaluation.rac_eval \
-#         --run $baseline \
-#         --qrel $CRUX_ROOT/crux-mds-multi_news/qrels/div_qrels-tau3.txt \
-#         --filter_by_oracle \
-#         --judge $CRUX_ROOT/crux-mds-multi_news/judge 
-# done
+for baseline in ${HOME}/crux/runs/*mds-multi_news.trec;do
+    echo $baseline
+    python -m crux.evaluation.rac_eval \
+        --run $baseline \
+        --qrel $CRUX_ROOT/crux-mds-multi_news/qrels/div_qrels-tau3.txt \
+        --filter_by_oracle \
+        --judge $CRUX_ROOT/crux-mds-multi_news/judge 
+done
