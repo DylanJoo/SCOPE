@@ -46,7 +46,7 @@ singularity exec $SIF  \
     --per_device_eval_batch_size 2048 \
     --passage_max_len 512 \
     --exclude_title \
-    --pooling mean --normalize \
+    --bf16 --pooling mean --normalize \
     --passage_prefix "search_document: " \
     --dataset_name DylanJHJ/beir-subset-corpus \
     --dataset_split $DATASET \
@@ -58,7 +58,7 @@ singularity exec $SIF  \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --pooling mean --normalize \
+    --bf16 --pooling mean --normalize \
     --per_device_eval_batch_size 128 \
     --dataset_name  DylanJHJ/beir-subset \
     --dataset_split $DATASET \
