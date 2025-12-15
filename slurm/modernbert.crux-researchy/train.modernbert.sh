@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/modernbert.out
-#SBATCH --error=logs/modernbert.err
+#SBATCH --output=logs/modernbert.out0
+#SBATCH --error=logs/modernbert.err0
 #SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
@@ -13,59 +13,50 @@
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
+export TOKENIZERS_PARALLELISM=false
 
 bsz=64
 nsample=512
 lr=1e-4
-# split=pos_20.neg_51.filtered
-# split=pos_high.neg_zero # 1
-# split=pos_half.neg_zero # 2
-# split=pos_low.neg_zero # 3
-# split=pos_high.neg_low # a
-# split=pos_high.neg_quarter # b
-split=pos_zero.neg_high # b
-max_length=512
-model_dir=${HOME}/models/modernbert-crux-researchy-${split}.b${bsz}_n${nsample}.${lr}.${max_length}
+split=pos_20.neg_51.filtered # 0
+model_dir=${HOME}/models/modernbert-crux-researchy-${split}.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}
 
 GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
+PRETRAINED=nomic-ai/modernbert-embed-base-unsupervised
 
 # Start experiments
 srun singularity exec $SIF \
     accelerate launch -m \
     --multi_gpu --mixed_precision=bf16 \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
-    tevatron.retriever.driver.train \
+    tevatron.retriever.driver.train_dev \
     --exclude_title \
     --output_dir ${model_dir} \
-    --model_name_or_path answerdotai/ModernBERT-base \
-    --save_steps 2500 \
+    --model_name_or_path $PRETRAINED \
+    --save_steps 1000 \
     --dataset_name DylanJHJ/crux-researchy \
     --corpus_name DylanJHJ/crux-researchy-corpus \
     --dataset_split $split \
     --per_device_train_batch_size 16 \
     --train_group_size 8 \
-    --pooling mean --normalize \
-    --temperature 0.02 \
     --prediction_loss_only True \
-    --do_eval True \
-    --eval_strategy steps \
-    --eval_dataset_name DylanJHJ/Qrels \
-    --eval_dataset_split msmarco_passage.trec_dl_2019 \
-    --eval_corpus_name Tevatron/msmarco-passage-corpus-new \
-    --eval_group_size 8 \
-    --per_device_eval_batch_size 64 \
-    --eval_steps 100 \
-    --bf16 \
+    --bf16 --pooling mean --normalize \
+    --passage_prefix "search_document: " \
+    --query_prefix "search_query: " \
+    --temperature 0.02 \
+    --eval_steps 1000 \
     --learning_rate $lr \
     --query_max_len 32 \
-    --passage_max_len $max_length \
+    --passage_max_len 512 \
     --dataloader_num_workers 4 \
-    --max_steps 10000 \
-    --warmup_steps 1000 \
+    --lr_scheduler_type 'cosine' \
+    --weight_decay 0.01 \
+    --max_steps 5000 \
+    --warmup_steps 500 \
     --logging_steps 10 \
     --overwrite_output_dir \
-    --run_name modernbert-base.crux-researchy-${split}.b${bsz}_n${nsample}.${lr}.${max_length}
+    --run_name ${model_dir##*/}
