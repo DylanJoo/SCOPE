@@ -1,0 +1,24 @@
+Encoding ...
+11/18/2025 10:09:17 - INFO - __main__ -   Pattern match found 0 files; loading them into index.
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/dju/tevatron/src/tevatron/retriever/driver/search.py", line 109, in <module>
+    main()
+  File "/home/dju/tevatron/src/tevatron/retriever/driver/search.py", line 67, in main
+    p_reps_0, p_lookup_0 = pickle_load(index_files[0])
+                                       ~~~~~~~~~~~^^^
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/dju/tevatron/src/tevatron/utils/format/convert_result_to_trec.py", line 9, in <module>
+    with open(args.input) as f_in, open(args.output, 'w') as f_out:
+         ^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/dju/indices/nano-beir-corpus/modernbert-msmarco-psg.b64_n512.1e-4.tau0.01/.run'
+usage: __main__.py [-h] [--places PLACES] [--by_query] [--no_summary]
+                   [--output_format {tsv,jsonl}]
+                   [--provider {accuracy,compat,cwl_eval,pyndeval,pytrec_eval,judged,gdeval,trectools,msmarco,ranx,runtime}]
+                   qrels run measures [measures ...]
+__main__.py: error: the following arguments are required: measures
+ | 
