@@ -7,9 +7,8 @@
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
-#SBATCH --array=2-3
 #SBATCH --mem=256G
-#SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=10:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
@@ -43,6 +42,7 @@ PRETRAINED=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
 AGG=mean
 
 split=pos_half.neg_zero
+split=pos_high.neg_quarter
 model_dir=${HOME}/models/msmarco-passage-pft.multiview-$AGG.kld-$covdistil_lambda.sq-$sq_contrastive_lambda.orth-$orthogonal_lambda.request
 
 mkdir -p ${model_dir}

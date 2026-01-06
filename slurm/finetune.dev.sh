@@ -2,14 +2,13 @@
 #SBATCH --job-name=train
 #SBATCH --output=logs/debug.out
 #SBATCH --error=logs/debug.err
-#SBATCH --partition=small-g
+#SBATCH --partition=dev-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=2           # Allocate one gpu per MPI rank
-#SBATCH --array=1%6
 #SBATCH --mem=256G
-#SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
+#SBATCH --time=2:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
 
 module use /appl/local/csc/modulefiles/
