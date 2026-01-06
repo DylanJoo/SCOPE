@@ -14,17 +14,22 @@
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4
-# model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy
-model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
-mkdir -p $output_dir
+MODEL_DIRS=(
+# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4"
+# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.0.00"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.0.10"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.0.25"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.0.50"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.1.00"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.sq.b64_n512.1e-4.1.50"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.b64_n512.1e-4.0.00"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.b64_n512.1e-4.0.10"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.b64_n512.1e-4.0.25"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.b64_n512.1e-4.0.50"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.covdistil.b64_n512.1e-4.1.00"
+"DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
+)
 
 DATASETS=(
 "beir.arguana"
@@ -43,15 +48,6 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-singularity exec $SIF  \
-    python -m tevatron.retriever.driver.search \
-    --query_reps $output_dir/query_emb.${DATASET}.pkl \
-    --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
-    --depth 100 \
-    --batch_size -1 \
-    --save_text \
-    --save_ranking_to $output_dir/${DATASET}.run
-
 QRELS=(
 "beir/arguana"
 "beir/climate-fever"
@@ -67,13 +63,27 @@ QRELS=(
 "beir/trec-covid"
 "beir/webis-touche2020/v2"
 )
-singularity exec $SIF  \
-    python -m tevatron.utils.format.convert_result_to_trec \
-    --input $output_dir/${DATASET}.run \
-    --output $output_dir/${DATASET}.trec
 
-irds_tag=${QRELS[$SLURM_ARRAY_TASK_ID]}
-result=$(singularity exec $SIF  python -m ir_measures $irds_tag $output_dir/${DATASET}.trec nDCG@10)
+for model_dir in "${MODEL_DIRS[@]}"; do
+    output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+    mkdir -p $output_dir
+    singularity exec $SIF  \
+        python -m tevatron.retriever.driver.search \
+        --query_reps $output_dir/query_emb.${DATASET}.pkl \
+        --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
+        --depth 100 \
+        --batch_size -1 \
+        --save_text \
+        --save_ranking_to $output_dir/${DATASET}.run
 
-short_name=$(basename "$DATASET" | cut -c6-8)
-echo "${short_name} | $result"
+    singularity exec $SIF  \
+        python -m tevatron.utils.format.convert_result_to_trec \
+        --input $output_dir/${DATASET}.run \
+        --output $output_dir/${DATASET}.trec
+
+    irds_tag=${QRELS[$SLURM_ARRAY_TASK_ID]}
+    result=$(singularity exec $SIF  python -m ir_measures $irds_tag $output_dir/${DATASET}.trec nDCG@10)
+
+    short_name=$(basename "$DATASET" | cut -c6-8)
+    echo "$model_dir | ${short_name} | $result"
+done

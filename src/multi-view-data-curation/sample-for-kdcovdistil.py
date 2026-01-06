@@ -1,3 +1,6 @@
+"""
+Haven't started yet. Need to get the coverage scores using ratings.
+"""
 import os
 from tqdm import tqdm 
 import argparse
@@ -9,7 +12,6 @@ from crux.tools.researchy.ir_utils import load_topic, load_subtopics
 parser = argparse.ArgumentParser()
 parser.add_argument('--split', type=str, default='train', help='Dataset split to analyze')
 parser.add_argument('--tau', type=int, default=4, help='Threshold for answerable subtopics')
-parser.add_argument('--overwrite', action='store_true', default=False)
 args = parser.parse_args()
 
 # main
@@ -22,7 +24,7 @@ CRUX_ROOT = os.environ.get("CRUX_ROOT", '/users/judylan1/datasets/crux')
 run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
-dataset_dict = {'pos_20.neg_51': [], 'pos_20.neg_51.filtered': []}
+dataset_dict = {'pos_20.neg_51': []}
 for qid in tqdm(run):
 
     # stat1: answerable 
@@ -32,6 +34,7 @@ for qid in tqdm(run):
 
     # stat2
     ## -1 mean exactly zero; -2 mean unjudged
+    document_ids_all = [docid for docid in run[qid]]
     document_ids = {0.75: [], 0.5: [], 0.25: [], 0.0: [], -1: [], -2: []}
     for i, docid in enumerate(run[qid]):
         rating = (judge[qid][docid] or [0])
@@ -48,25 +51,15 @@ for qid in tqdm(run):
         if i > 50: # only include negative after 50
             document_ids[-2].append(docid)
 
-    # 1. single-list sampling
-    document_ids_all = [docid for docid in run[qid]]
-    dataset_dict['pos_20.neg_51'].append({
-        'query_id': qid, 
-        'query_text': topic[str(qid)],
-        'positive_document_ids': document_ids_all[:20], 
-        'negative_document_ids': document_ids_all[50:],
-        'answer': None,
-        'source': f'clueweb22-B',
-    })
-
-    # 2. single-list sampling + coverage-based filtering
+    # 1. single-list sampling + coverage-based filtering
     filterd_top20 = [docid for docid in document_ids_all[:20] if docid not in document_ids[-1]]
     if len(filterd_top20) > 0:
-        dataset_dict['pos_20.neg_51.filtered'].append({
+        dataset_dict['pos_20.neg_51'].append({
             'query_id': qid, 
             'query_text': topic[str(qid)],
             'positive_document_ids': filterd_top20,
             'negative_document_ids': document_ids_all[50:],
+            'subquestions': subtopics[str(qid)],
             'answer': None,
             'source': f'crux-researchy.tau:{tau}.clueweb22-B',
         })
@@ -120,18 +113,12 @@ for qid in tqdm(run):
                 'query_text': topic[str(qid)],
                 'positive_document_ids': positive_docs,
                 'negative_document_ids': negative_docs,
+                'subquestions': subtopics[str(qid)],
                 'answer': None,
                 'source': f'crux-researchy.tau:{tau}.clueweb22-B',
             })
 
 ## Transform to dataset (the base)
-## Transform to dataset (other subset)
-
-if args.overwrite:
-    dataset_dict['train'] = dataset_dict['pos_20.neg_51']
-    dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
-    dataset.push_to_hub("DylanJHJ/crux-researchy")
-else:
-    dataset = Dataset.from_list( dataset_dict['pos_zero.neg_high'] )
-    print(dataset)
-    dataset.push_to_hub("DylanJHJ/crux-researchy", split='pos_zero.neg_high')
+dataset_dict['train'] = dataset_dict['pos_20.neg_51']
+dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
+dataset.push_to_hub("DylanJHJ/crux-researchy-new")

@@ -1,12 +1,13 @@
 #!/bin/bash -l
 #SBATCH --job-name=train
-#SBATCH --output=logs/two-stage.out
-#SBATCH --error=logs/two-stage.err
+#SBATCH --output=logs/covdistil.out.%a
+#SBATCH --error=logs/covdistil.err.%a
 #SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=4           # Allocate one gpu per MPI rank
+#SBATCH --array=0-15
 #SBATCH --mem=256G
 #SBATCH --time=12:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
@@ -15,10 +16,26 @@ module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 export TOKENIZERS_PARALLELISM=false
 
+A=(0.0 0.1 0.25 0.5)
+B=(0.0 0.25 0.5 1.0)
+
+NA=${#A[@]}
+NB=${#B[@]}
+
+iA=$(( SLURM_ARRAY_TASK_ID / NB ))
+iB=$(( SLURM_ARRAY_TASK_ID % NB ))
+
+covdistil_lambda=${A[$iA]}
+sq_contrastive_lambda=${B[$iB]}
+
+AGG=max
 bsz=64
 nsample=512
 lr=1e-4
+PRETRAINED=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
+
 split=pos_half.neg_zero
+model_dir=${HOME}/models/gridsearch_lambdas/msmarco-passage-pft.$AGG.kld-$covdistil_lambda.sq-$sq_contrastive_lambda.orth-0.0.request
 
 mkdir -p ${model_dir}
 
@@ -26,22 +43,18 @@ GPUS_PER_NODE=4
 NUM_NODES=1
 NUM_PROCESSES=$(expr $NUM_NODES \* $GPUS_PER_NODE)
 
-PRETRAINED=DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k
-model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-${split}.b${bsz}_n${nsample}.${lr}.crux-researchy.request
-
-# PRETRAINED=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
-# model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-${split}.b${bsz}_n${nsample}.${lr}.msmarco.request
+echo "Running with λA=$covdistil_lambda, λB=$sq_contrastive_lambda"
 
 # Start experiments
 srun singularity exec $SIF \
     accelerate launch -m \
     --multi_gpu --mixed_precision=bf16 \
     --num_processes $NUM_PROCESSES  --num_machines $NUM_NODES \
-    tevatron.retriever.driver.train_dev \
+    tevatron.retriever.driver.train_covdistil \
     --exclude_title \
     --output_dir ${model_dir} \
     --model_name_or_path $PRETRAINED \
-    --save_steps 1000 \
+    --save_steps 5000 \
     --dataset_name DylanJHJ/crux-researchy-new \
     --corpus_name DylanJHJ/crux-researchy-corpus \
     --dataset_split $split \
@@ -51,8 +64,14 @@ srun singularity exec $SIF \
     --bf16 --pooling mean --normalize \
     --passage_prefix "search_document: " \
     --query_prefix "search_query: " \
+    --subquery_prefix "search_query: " \
     --request_as_query \
     --temperature 0.02 \
+    --distil_temperature 0.02 \
+    --aggregation_strategy $AGG \
+    --covdistil_method KLD \
+    --covdistil_lambda $covdistil_lambda \
+    --sq_contrastive_lambda $sq_contrastive_lambda \
     --eval_steps 1000 \
     --learning_rate $lr \
     --query_max_len 128 \

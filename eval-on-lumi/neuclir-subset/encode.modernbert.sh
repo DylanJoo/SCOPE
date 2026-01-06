@@ -2,13 +2,13 @@
 #SBATCH --job-name=encode
 #SBATCH --output=logs/modernbert.out
 #SBATCH --error=logs/modernbert.err
-#SBATCH --partition=dev-g
+#SBATCH --partition=small-g
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=64G
-#SBATCH --time=00:30:00
+#SBATCH --time=12:00:00
 #SBATCH --account=project_465002438
 
 # ENV
@@ -17,7 +17,6 @@ module use /appl/local/training/modules/AI-20241126/
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"nomic-ai/modernbert-embed-base"
 # "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
 # "DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k"
 # "nomic-ai/modernbert-embed-base-unsupervised"
@@ -30,10 +29,36 @@ MODEL_DIRS=(
 # "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4"
 # "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy"
 # "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-1.0.multiview.ind"
 )
 
 for model_dir in "${MODEL_DIRS[@]}"; do
     output_dir=${HOME}/indices/neuclir1-subset-corpus/${model_dir##*/}
+    model_dir=$model_dir/checkpoint-5000
     mkdir -p $output_dir
 
     singularity exec $SIF  \
@@ -56,7 +81,8 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --model_name_or_path $model_dir \
         --pooling mean --bf16 --normalize \
         --per_device_eval_batch_size 64 \
-        --query_prefix "search_query: " \
+        --query_prefix "search_query:[unused0][unused1][unused2][unused3][unused4]" \
+        --num_views 5 \
         --dataset_path $topic_path \
         --encode_output_path $output_dir/query_emb.pkl \
         --query_max_len 256 \

@@ -18,7 +18,7 @@ export TOKENIZERS_PARALLELISM=false
 bsz=64
 nsample=512
 lr=1e-4
-split=pos_20.neg_51.filtered # 0
+split=pos_20.neg_51.filtered
 model_dir=${HOME}/models/modernbert-crux-researchy-${split}.b${bsz}_n${nsample}.${lr}
 
 mkdir -p ${model_dir}

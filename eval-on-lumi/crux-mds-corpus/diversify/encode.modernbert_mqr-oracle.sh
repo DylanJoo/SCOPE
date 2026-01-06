@@ -26,7 +26,7 @@ for model_dir in "${MODEL_DIRS[@]}"; do
     mkdir -p $output_dir
 
     for subset in crux-mds-duc04 crux-mds-multi_news;do
-        topic_path=${HOME}/SCOPE/src/create-crux-mds-subqueries/${subset}.qwen2.5-7b-instruct.subquestions.jsonl
+        topic_path=${HOME}/SCOPE/src/create-crux-mds-subqueries/${subset}.oracle.subquestions.jsonl
         singularity exec $SIF \
             python -m tevatron.retriever.driver.encode \
             --output_dir=temp \
@@ -36,7 +36,7 @@ for model_dir in "${MODEL_DIRS[@]}"; do
             --query_prefix "search_query: " \
             --per_device_eval_batch_size 256 \
             --dataset_path $topic_path \
-            --encode_output_path $output_dir/query_emb.${subset}.mqr.pkl \
+            --encode_output_path $output_dir/query_emb.${subset}.mqr.oracle.pkl \
             --query_max_len 128 \
             --encode_is_query
     done

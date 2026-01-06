@@ -27,7 +27,6 @@ for model_dir in "${MODEL_DIRS[@]}"; do
     singularity exec $SIF  \
         python -m tevatron.retriever.driver.encode \
         --output_dir=temp \
-        --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
         --per_device_eval_batch_size 64 \
         --bf16 \
@@ -43,7 +42,6 @@ for model_dir in "${MODEL_DIRS[@]}"; do
     singularity exec $SIF  \
         python -m tevatron.retriever.driver.encode \
         --output_dir=temp \
-        --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
         --bf16 \
         --normalize \

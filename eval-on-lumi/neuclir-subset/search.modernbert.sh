@@ -8,7 +8,7 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
 #SBATCH --time=00:30:00
-#SBATCH --account=project_465001640 # Project for billing
+#SBATCH --account=project_465002438
 
 # ENV
 module use /appl/local/csc/modulefiles/
@@ -17,7 +17,7 @@ source ${HOME}/temp/venv/crux/bin/activate
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"nomic-ai/modernbert-embed-base"
+# "nomic-ai/modernbert-embed-base"
 # "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
 # "DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k"
 # "nomic-ai/modernbert-embed-base-unsupervised"
@@ -28,8 +28,43 @@ MODEL_DIRS=(
 # "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4"
 # "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4"
 # "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4"
-"${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy"
-"${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
+# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy"
+# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-max.covdistil-kld.0.10"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-max.covdistil-kld.0.25"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-max.covdistil-kld.0.50"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-kld.0.00"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-kld.0.10"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-kld.0.25"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-kld.0.50"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-marginmse.0.10"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-marginmse.0.25"
+# "${HOME}/models/modernbert-crux-researchy-pos_half.neg_zero.agg-mean.covdistil-marginmse.0.50"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.0.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.1.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.25.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.5.sq-1.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.0.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.1.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.25.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-0.5.multiview.ind"
+"${HOME}/models/gridsearch.kld-0.75.sq-1.0.multiview.ind"
 )
 
 for model_dir in "${MODEL_DIRS[@]}"; do
@@ -40,7 +75,7 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --query_reps $output_dir/query_emb.pkl \
         --passage_reps $output_dir/'corpus_emb*pkl' \
         --depth 100 \
-        --batch_size -1 \
+        --batch_size 32 \
         --save_text \
         --save_ranking_to $output_dir/neuclir24-test.run
 

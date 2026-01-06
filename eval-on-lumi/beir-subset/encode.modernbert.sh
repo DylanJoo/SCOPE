@@ -7,7 +7,7 @@
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1           # Allocate one gpu per MPI rank
-#SBATCH --array=10%13
+#SBATCH --array=0-12%13
 #SBATCH --mem=64G
 #SBATCH --time=01:00:00           # Run time (d-hh:mm:ss)
 #SBATCH --account=project_465002438 # Project for billing
@@ -33,8 +33,11 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-for model_dir in ${HOME}/models/ablation.two-stage/modernbert-two-stage-*;do
+# for model_dir in ${HOME}/models/ablation.two-stage/modernbert-two-stage-*;do
+# for model_dir in ${HOME}/models/*half*covdistil*;do
+for model_dir in DylanJHJ/nomic.modernbert-base.msmarco-passage.10k;do
 output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
+# model_dir=$model_dir/checkpoint-5000
 mkdir -p $output_dir
 
 echo Encoding $DATASET corpus
@@ -46,7 +49,7 @@ singularity exec $SIF  \
     --per_device_eval_batch_size 2048 \
     --passage_max_len 512 \
     --exclude_title \
-    --bf16 --pooling mean --normalize \
+    --pooling mean --normalize \
     --passage_prefix "search_document: " \
     --dataset_name DylanJHJ/beir-subset-corpus \
     --dataset_split $DATASET \
@@ -58,7 +61,7 @@ singularity exec $SIF  \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --bf16 --pooling mean --normalize \
+    --pooling mean --normalize \
     --per_device_eval_batch_size 128 \
     --dataset_name  DylanJHJ/beir-subset \
     --dataset_split $DATASET \

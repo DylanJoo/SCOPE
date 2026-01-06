@@ -7,8 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
-#SBATCH --time=02:00:00
-#SBATCH --account=project_465002438
+#SBATCH --time=00:30:00
+#SBATCH --account=project_465001640 # Project for billing
 
 # ENV
 module use /appl/local/csc/modulefiles/
@@ -17,36 +17,32 @@ source "/users/judylan1/temp/miniconda3/etc/profile.d/conda.sh"
 conda activate gpt
 
 CRUX_ROOT=${HOME}/datasets/crux
-MODEL_DIRS=(
-"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.1.sq-0.25.orth-0.001.request"
-)
+# model_dir="nomic-ai/modernbert-embed-base-unsupervised"
+model_dir="DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
+output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
+mkdir -p $output_dir
 
 for subset in crux-mds-duc04 crux-mds-multi_news;do
-
-    for model_dir in "${MODEL_DIRS[@]}"; do
-        output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
-        mkdir -p $output_dir
-        echo $output_dir
+    for fusion in ranklist-round-robin score-sum ranklist-reciprocal-fusion;do
         singularity exec $SIF  \
-            python -m tevatron.retriever.driver.search \
-            --query_reps $output_dir/query_emb.$subset.pkl \
+            python -m tevatron.retriever.driver.diversify.mqr \
+            --query_reps $output_dir/query_emb.$subset.mqr.oracle.pkl \
             --passage_reps $output_dir/'corpus_emb.*.pkl' \
             --depth 100 \
-            --batch_size 32 \
+            --batch_size -1 \
             --save_text \
-            --aggregation_strategy mean \
-            --save_ranking_to $output_dir/$subset.run
-        
+            --save_ranking_to $output_dir/$subset.mqr.oracle.run \
+            --fusion_method $fusion
+
         singularity exec $SIF  \
             python -m tevatron.utils.format.convert_result_to_trec \
-            --input $output_dir/$subset.run \
-            --output $output_dir/$subset.trec
+            --input $output_dir/$subset.mqr.oracle.run \
+            --output $output_dir/$subset.mqr.oracle.trec.$fusion
 
         python -m crux.evaluation.rac_eval \
-            --run $output_dir/$subset.trec \
+            --run $output_dir/$subset.mqr.oracle.trec.$fusion \
             --qrel $CRUX_ROOT/$subset/qrels/div_qrels-tau3.txt \
             --filter_by_oracle \
             --judge $CRUX_ROOT/$subset/judge 
     done
 done
-
