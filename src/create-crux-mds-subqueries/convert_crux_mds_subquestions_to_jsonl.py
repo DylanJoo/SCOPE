@@ -1,7 +1,7 @@
 import json
 from crux.tools.mds.ir_utils import load_topic, load_subtopics
 
-## Flatten ground truth subquestions and save to JSONL files
+## CRUX-MDS
 for subset in ['duc04', 'multi_news']:
     subtopics = load_subtopics(subset)
     topics = load_topic(subset)

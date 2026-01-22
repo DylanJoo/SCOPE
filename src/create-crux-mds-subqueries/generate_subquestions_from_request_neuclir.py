@@ -1,6 +1,6 @@
 import re
 import json
-from crux.tools.mds.ir_utils import load_topic
+from crux.tools.neuclir.ir_utils import load_topic
 from vllm import LLM, SamplingParams
 from tqdm import tqdm
 
@@ -37,8 +37,8 @@ client = LLM('Qwen/Qwen2.5-7B-Instruct')
 sampling_params = SamplingParams(temperature=0.8, max_tokens=2048)
 
 ## Flatten ground truth subquestions and save to JSONL files
-for subset in ['mds-duc04', 'mds-multi_news']:
-    topics = load_topic(subset)
+for subset in ['neuclir']:
+    topics = load_topic()
     batch_input_ids = []
     batch_inputs = []
 
