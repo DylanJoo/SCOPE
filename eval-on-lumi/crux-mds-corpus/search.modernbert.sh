@@ -18,7 +18,10 @@ conda activate gpt
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.1.sq-0.25.orth-0.001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.1.orth-0.0001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.1.orth-0.001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.25.orth-0.0001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.25.orth-0.001.request"
 )
 
 for subset in crux-mds-duc04 crux-mds-multi_news;do
@@ -34,7 +37,7 @@ for subset in crux-mds-duc04 crux-mds-multi_news;do
             --depth 100 \
             --batch_size 32 \
             --save_text \
-            --aggregation_strategy mean \
+            --aggregation_strategy rrf \
             --save_ranking_to $output_dir/$subset.run
         
         singularity exec $SIF  \

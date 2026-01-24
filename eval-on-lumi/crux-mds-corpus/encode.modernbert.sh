@@ -7,9 +7,8 @@
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1
-#SBATCH --mem=64G
-#SBATCH --time=10:00:00
-#SBATCH --array=0
+#SBATCH --time=2:00:00
+#SBATCH --array=0-3
 #SBATCH --account=project_465002438
 
 # ENV
@@ -18,24 +17,15 @@ module use /appl/local/training/modules/AI-20241126/
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-# "nomic-ai/modernbert-embed-base-unsupervised"
-# "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
-# "DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4.request"
-# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco.request"
-# "${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy.request"
-"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.1.sq-0.25.orth-0.001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.1.orth-0.0001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.1.orth-0.001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.25.orth-0.0001.request"
+"${HOME}/models/msmarco-passage-pft.multiview-mean.kld-0.25.sq-0.25.orth-0.001.request"
 )               
 
 model_dir="${MODEL_DIRS[$SLURM_ARRAY_TASK_ID]}"
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
-model_dir=$model_dir/checkpoint-5000
+model_dir=$model_dir/checkpoint-7500
 query_prefix="search_query:[unused0][unused1][unused2][unused3][unused4]"
 num_views=5
 

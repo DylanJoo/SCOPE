@@ -17,7 +17,7 @@ module use /appl/local/training/modules/AI-20241126/
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-"nomic-ai/modernbert-embed-base-unsupervised"
+# "nomic-ai/modernbert-embed-base-unsupervised"
 "DylanJHJ/nomic.modernbert-base.msmarco-passage.10k"
 )
 

@@ -1,13 +1,13 @@
 import json
-from crux.tools.mds.ir_utils import load_topic, load_subtopics
+from crux.tools.neuclir.ir_utils import load_topic, load_subtopics
 
 subtopics = load_subtopics('subquestions')
-topics = load_topic(subset)
+topics = load_topic()
 
 # filter the unused subtopics
 subtopics = {k: v for k, v in subtopics.items() if k in topics}
 
-with open(f'crux-mds-{subset}.oracle.subquestions.jsonl', 'w') as f_out:
+with open(f'crux-neuclir.oracle.subquestions.jsonl', 'w') as f_out:
     for topic_id, subtopic_list in subtopics.items():
         for i, subtopic in enumerate(subtopic_list):
             entry = {
