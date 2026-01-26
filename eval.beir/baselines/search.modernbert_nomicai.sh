@@ -10,12 +10,11 @@
 #SBATCH --time=00:30:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
+source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 model_dir=nomic-ai/modernbert-embed-base-unsupervised
 output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
-mkdir -p $output_dir
 
 DATASETS=(
 "beir.arguana"

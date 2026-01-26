@@ -2,6 +2,7 @@ wandb/
 *out
 *swp
 *err
+**/**log*
 **/**out*
 **/**err*
 **/**.swp

@@ -1,0 +1,7 @@
+nfc | nDCG@10	0.3461
+arg | nDCG@10	0.3666
+fiq | nDCG@10	0.4050
+sci | nDCG@10	0.1981
+sci | nDCG@10	0.7068
+tre | nDCG@10	0.7791
+web | nDCG@10	0.2446

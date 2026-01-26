@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #SBATCH --job-name=encode
-#SBATCH --output=logs/encode3.out.%a
-#SBATCH --error=logs/encode3.err.%a
+#SBATCH --output=logs/encode.out.%a
+#SBATCH --error=logs/encode.err.%a
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
@@ -13,10 +13,12 @@
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
-model_dir=nomic-ai/modernbert-embed-base-unsupervised
-model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
-model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco
-model_dir=${HOME}/models/ablation.cov-samping/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.request
+# model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.request
+# model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy.request
+# model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco.request
+# model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
+model_dir=${HOME}/models/main.learning/ce_1.0-selfdistil_0.0
 output_dir=${HOME}/indices/neuclir1/${model_dir##*/}
 mkdir -p $output_dir
 

@@ -1,13 +1,12 @@
 #!/bin/bash -l
-#SBATCH --job-name=search
-#SBATCH --output=result.out.%a
-#SBATCH --error=result.err.%a
-#SBATCH --ntasks-per-node=1
-#SBATCH --nodes=1
+#SBATCH --job-name=result
 #SBATCH --cpus-per-task=32
-#SBATCH --array=0
-#SBATCH --mem=128G
-#SBATCH --time=00:30:00
+#SBATCH --partition cpu
+#SBATCH --mem=256G
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --time=1:00:00
+#SBATCH --output=%x.out
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
@@ -15,16 +14,12 @@ conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux
 MODEL_DIRS=(
-# ${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.request
-# ${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.request
-# ${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy.request
-# ${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco.request
-${HOME}/models/main.learning/ce_1.0-selfdistil_0.0
+Qwen/Qwen3-Embedding-0.6B
 )
 
 model_dir=${MODEL_DIRS[$SLURM_ARRAY_TASK_ID]}
 output_dir=${HOME}/indices/neuclir1/${model_dir##*/}
-mkdir -p $output_dir
+
 python -m tevatron.retriever.driver.search \
     --query_reps $output_dir/query_emb.pkl \
     --passage_reps $output_dir/'corpus_emb*pkl' \

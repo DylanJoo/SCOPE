@@ -33,7 +33,7 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --normalize \
         --pooling last \
         --padding_side left \
-        --passage_prefix "search_document: " \
+        --passage_prefix "" \
         --passage_max_len 1024 \
         --dataset_name DylanJHJ/neuclir1-subset-corpus  \
         --encode_output_path $output_dir/corpus_emb.pkl
@@ -48,11 +48,9 @@ for model_dir in "${MODEL_DIRS[@]}"; do
         --pooling last \
         --padding_side left \
         --per_device_eval_batch_size 64 \
-        --query_prefix "Instruct: Given a web search query, retrieve relevant passages that provide context to the query.\nQuery:" \
+        --query_prefix "Instruct: Given a report request, retrieve relevant passages that provide context to the report.\nQuery:" \
         --dataset_path $topic_path \
         --encode_output_path $output_dir/query_emb.pkl \
         --query_max_len 256 \
         --encode_is_query
-        # --query_prefix "Instruct: Given a report request, retrieve relevant passages that provide context to the report.\nRequest:" \
 done
-

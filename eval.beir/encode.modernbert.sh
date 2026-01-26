@@ -1,23 +1,19 @@
 #!/bin/bash -l
-#SBATCH --job-name=encode
+#SBATCH --job-name=modernbert
 #SBATCH --output=logs/encode.out.%a
 #SBATCH --error=logs/encode.err.%a
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:nvidia_rtx_a6000:1
 #SBATCH --ntasks-per-node=1        
 #SBATCH --nodes=1                
-#SBATCH --array=0-12%2
+#SBATCH --array=0-12%6
 #SBATCH --mem=32G
-#SBATCH --time=12:00:00
+#SBATCH --time=2-00:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
+source ${HOME}/.bashrc
+initconda
 conda activate inference 
-
-model_dir=DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k
-corpus_name=beir-corpus
-output_dir=${HOME}/indices/${corpus_name}/${model_dir##*/}
-mkdir -p $output_dir
 
 DATASETS=(
 "beir.arguana"
@@ -36,33 +32,39 @@ DATASETS=(
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-for SHARD_ID in 0 1;do
-    echo Encoding $DATASET corpus $SHARD_ID
+for model_dir in ${HOME}/models/tmp-models/cov-contrastive/*10k;do
+    output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
+    model_dir=$model_dir/checkpoint-10000
+    mkdir -p $output_dir
+
+    for SHARD_ID in 0 1;do
+        echo Encoding $DATASET corpus $SHARD_ID
+        python -m tevatron.retriever.driver.encode \
+            --output_dir=temp \
+            --tokenizer_name answerdotai/ModernBERT-base \
+            --model_name_or_path $model_dir \
+            --per_device_eval_batch_size 2048 \
+            --passage_max_len 512 \
+            --pooling mean --normalize --bf16 \
+            --passage_prefix "search_document: " \
+            --dataset_name DylanJHJ/beir-corpus \
+            --dataset_split $DATASET \
+            --encode_output_path $output_dir/corpus_emb.${DATASET}-${SHARD_ID}.pkl \
+            --dataset_shard_index ${SHARD_ID} \
+            --dataset_number_of_shards 2
+    done
+
+    echo Encoding $DATASET queries
     python -m tevatron.retriever.driver.encode \
         --output_dir=temp \
         --tokenizer_name answerdotai/ModernBERT-base \
         --model_name_or_path $model_dir \
-        --per_device_eval_batch_size 2048 \
-        --passage_max_len 512 \
-        --bf16 --pooling mean --normalize  \
-        --passage_prefix "search_document: " \
-        --dataset_name DylanJHJ/${corpus_name} \
+        --pooling mean --normalize --bf16 \
+        --query_prefix "search_query: " \
+        --per_device_eval_batch_size 128 \
+        --dataset_name  DylanJHJ/beir-subset \
         --dataset_split $DATASET \
-        --encode_output_path $output_dir/corpus_emb.${DATASET}-${SHARD_ID}.pkl \
-        --dataset_shard_index ${SHARD_ID} \
-        --dataset_number_of_shards 2 
+        --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
+        --query_max_len 256 \
+        --encode_is_query
 done
-
-echo Encoding $DATASET queries
-python -m tevatron.retriever.driver.encode \
-    --output_dir=temp \
-    --tokenizer_name answerdotai/ModernBERT-base \
-    --model_name_or_path $model_dir \
-    --pooling mean --normalize --bf16 \
-    --query_prefix "search_query: " \
-    --per_device_eval_batch_size 128 \
-    --dataset_name  DylanJHJ/beir-subset \
-    --dataset_split $DATASET \
-    --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
-    --query_max_len 256 \
-    --encode_is_query

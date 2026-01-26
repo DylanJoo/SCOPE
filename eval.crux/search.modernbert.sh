@@ -14,8 +14,12 @@ conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux
 
-model_dir=nomic-ai/modernbert-embed-base-unsupervised
-model_dir=DylanJHJ/repllama-3.1-8b.msmarco-passage.4k
+model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
+# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.request
+# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.request
+# model_dir=/home/dju/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.crux-researchy.request
+# model_dir=/home/dju/models/main.learning/ce_1.0-selfdistil_0.1
+# model_dir=nomic-ai/modernbert-embed-base-unsupervised
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
 

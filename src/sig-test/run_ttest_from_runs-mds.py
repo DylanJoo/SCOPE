@@ -1,14 +1,15 @@
+import numpy as np
+import argparse
 import sys
 import json
-from crux.evaluation.rac_eval import rac_eval
 from scipy import stats
+from crux.evaluation.rac_eval import rac_eval
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # parser.add_argument("--run", type=str, required=True, help="Path to the run file")
     parser.add_argument("--qrel", type=str, required=True, help="Path to the qrel file")
     parser.add_argument("--judge", type=str, required=True, help="jsonl: {'id': str, 'docid': List[str], 'ratings': List[int]'}")
-    parser.add_argument("--run_b", type=str, default=None)
     parser.add_argument("--filter_by_oracle", action="store_true", default=False)
     parser.add_argument("--run_a", type=str)
     parser.add_argument("--run_b", type=str)
@@ -23,6 +24,12 @@ if __name__ == "__main__":
     # load runs
     runa = load_run_or_qrel(args.run_a, topk=10)
     runb = load_run_or_qrel(args.run_b, topk=10)
+
+    ## sanity check
+    missing_qids = [qid for qid in qrel.keys() if qid not in runa]
+    if len(missing_qids) > 0:
+        qrel = {k: v for k, v in qrel.items() if k in runa}
+        div_qrel = div_qrel[div_qrel['query_id'].isin(runa.keys())]
 
     outputa = rac_eval(
         run=runa, 
@@ -44,15 +51,13 @@ if __name__ == "__main__":
         filter_by_oracle=args.filter_by_oracle, 
     )
 
-#### End here
-# print(f"### {args.input_run_1} > {args.input_run_2} | p-value   | ")
-# for metric in ['nDCG', 'P', 'alpha_nDCG', 'coverage']:
-#     list1 = output1[metric]
-#     list2 = output2[metric]
-#     t_stat, p_value_two_tailed = stats.ttest_rel(list1, list2)
-#     if t_stat > 0:
-#         if p_value_two_tailed/2 < 0.1:
-#             print(f"### {metric}: one-tailed p-value = {p_value_two_tailed/2}")
-#     else:
-#         if (1-p_value_two_tailed/2) < 0.1:
-#             print(f"### {metric}:  one-tailed p-value = {1-p_value_two_tailed/2}")
+    ### T-test
+    print(f"### {args.run_a} > \n{args.run_b} | p-value   | ")
+    for metric in ['P@10', 'nDCG@10', 'alpha_nDCG@10', 'Cov@10']:
+        list1 = outputa[metric]
+        list2 = outputb[metric]
+        t_stat, p_value = stats.ttest_rel(list1, list2, alternative='greater')
+        if p_value < 0.1:
+            mean1 = np.mean(list1)
+            mean2 = np.mean(list2)
+            print(f"OO {metric}: p = {p_value} ", mean1, mean2)

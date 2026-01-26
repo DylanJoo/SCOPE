@@ -1,21 +1,20 @@
 #!/bin/bash -l
 #SBATCH --job-name=search
-#SBATCH --output=result.%a
+#SBATCH --output=logs/result.qwen3.out.%a
 #SBATCH --partition=cpu
 #SBATCH --ntasks-per-node=1
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=16
 #SBATCH --array=0-12%13
-#SBATCH --mem=48G
-#SBATCH --time=00:30:00
+#SBATCH --mem=512G
+#SBATCH --time=2:00:00
 
 # ENV
 source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
-model_dir=DylanJHJ/dpr.bert-base-uncased.msmarco-passage.25k
+model_dir=Qwen/Qwen3-Embedding-0.6B
 output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
-mkdir -p $output_dir
 
 DATASETS=(
 "beir.arguana"
@@ -53,7 +52,7 @@ irds_tag=${QRELS[$SLURM_ARRAY_TASK_ID]}
 
 python -m tevatron.retriever.driver.search \
     --query_reps $output_dir/query_emb.${DATASET}.pkl \
-    --passage_reps $output_dir/corpus_emb.${DATASET}.pkl \
+    --passage_reps "$output_dir/corpus_emb.${DATASET}*pkl" \
     --depth 100 \
     --batch_size -1 \
     --save_text \

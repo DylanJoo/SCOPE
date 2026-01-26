@@ -19,7 +19,7 @@ model_dir=${HOME}/models/main.learning/modernbert-two-stage-crux-researchy-pos_h
 output_dira=${HOME}/indices/neuclir1/${model_dir##*/}
 
 model_dir=nomic-ai/modernbert-embed-base-unsupervised
-model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
+# model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
 output_dirb=${HOME}/indices/neuclir1/${model_dir##*/}
 
 python run_ttest_from_runs-neuclir.py \
