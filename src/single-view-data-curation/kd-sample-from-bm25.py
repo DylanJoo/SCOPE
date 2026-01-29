@@ -6,8 +6,8 @@ from datasets import Dataset, load_dataset
 from crux.tools import load_run_or_qrel
 
 # main
-# run = load_run_or_qrel('/users/judylan1/datasets/msmarco-passage-kd/run.msmarco-v1-passage.bm25+qwen3-default.train.txt')
-run = load_run_or_qrel('/users/judylan1/datasets/msmarco-passage-kd/run.all.txt', topk=2000)
+# run = load_run_or_qrel('/users//datasets/msmarco-passage-kd/run.msmarco-v1-passage.bm25+qwen3-default.train.txt')
+run = load_run_or_qrel('/users//datasets/msmarco-passage-kd/run.all.txt', topk=2000)
 ds = load_dataset('Tevatron/msmarco-passage-new')['train']
 dataset_list = []
 
@@ -32,4 +32,4 @@ for example in ds:
 
 ## Transform to dataset (the base)
 dataset = Dataset.from_list(dataset_list)
-dataset.push_to_hub("DylanJHJ/msmarco-passage-new-qwen3-0.6b-rerank")
+dataset.push_to_hub("/msmarco-passage-new-qwen3-0.6b-rerank")

@@ -17,7 +17,7 @@ tau = args.tau
 
 topic = load_topic(split)
 subtopics = load_subtopics(split)
-CRUX_ROOT = os.environ.get("CRUX_ROOT", '/users/judylan1/datasets/crux')
+CRUX_ROOT = os.environ.get("CRUX_ROOT", '/users/??/datasets/crux')
 run = load_run_or_qrel(f'{CRUX_ROOT}/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
 judge = load_ratings(f'{CRUX_ROOT}/crux-researchy/judge/')
 
@@ -120,4 +120,4 @@ for qid in tqdm(run):
 ## Transform to dataset (the base)
 dataset_dict['train'] = dataset_dict['pos_20.neg_51']
 dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
-dataset.push_to_hub("DylanJHJ/crux-researchy-kd")
+dataset.push_to_hub("/crux-researchy-kd")

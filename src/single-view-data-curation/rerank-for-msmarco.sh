@@ -13,8 +13,8 @@
 
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
-source "/users/judylan1/temp/miniconda3/etc/profile.d/conda.sh"
-source /users/judylan1/temp/venv/crc/bin/activate
+source "/users//temp/miniconda3/etc/profile.d/conda.sh"
+source /users//temp/venv/crc/bin/activate
 
 # Start experiments
 srun singularity exec $SIF python rerank-for-msmarco.py

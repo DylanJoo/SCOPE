@@ -76,4 +76,4 @@ for split in ['msmarco_passage.trec_dl_2019', 'msmarco_passage.trec_dl_2020']:
 ## Transform to dataset
 qrel_dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
 print(qrel_dataset)
-qrel_dataset.push_to_hub("DylanJHJ/msmarco-passage-trec") # original name is qrels
+qrel_dataset.push_to_hub("/msmarco-passage-trec") # original name is qrels

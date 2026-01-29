@@ -14,8 +14,8 @@ tau = args.tau
 
 topic = load_topic(split)
 subtopics = load_subtopics(split)
-run = load_run_or_qrel(f'/exp/scale25/artifacts/crux/crux-researchy/runs/run.researchy-{split}-init-q.bm25+qwen3.clueweb22-b.txt')
-judge = load_ratings('/exp/scale25/artifacts/crux/crux-researchy/judge/')
+run = ??
+judge = ??
 
 count = 0
 report = {}

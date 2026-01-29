@@ -56,4 +56,4 @@ for qid in tqdm(run):
 ## Transform to dataset (other subset)
 dataset = Dataset.from_list(dataset_dict['flatten'])
 print(dataset)
-dataset.push_to_hub("DylanJHJ/crux-researchy", split=args.split_flatten)
+dataset.push_to_hub("/crux-researchy", split=args.split_flatten)

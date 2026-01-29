@@ -80,7 +80,7 @@ def rerank(batch_size, split='train'):
     from crux.tools import load_run_or_qrel, batch_iterator
     from datasets import load_dataset
 
-    run = load_run_or_qrel('/users/judylan1/datasets/msmarco-passage-kd/run.msmarco-v1-passage.bm25+qwen3-default.train.txt')
+    run = load_run_or_qrel('/users/datasets/msmarco-passage-kd/run.msmarco-v1-passage.bm25+qwen3-default.train.txt')
 
     ds = load_dataset('Tevatron/msmarco-passage-new')['train']
     queries = {ex['query_id']: ex['query_text'] for ex in ds}
@@ -92,7 +92,7 @@ def rerank(batch_size, split='train'):
     corpus = {ex['docid']: ex['text'] for ex in ds}
     print(f"Data loading complete. Number of documents: {len(corpus)}")
 
-    output_run = f'/users/judylan1/datasets/msmarco-passage-kd/run.tevatron-msmarco-passage-new.train.txt'
+    output_run = f'/users//datasets/msmarco-passage-kd/run.tevatron-msmarco-passage-new.train.txt'
     if os.path.exists(output_run):
         run_done = load_run_or_qrel(output_run)
         output_run += ".new"

@@ -39,7 +39,7 @@ orthogonal_lambda=${C[$iC]}
 bsz=64
 nsample=512
 lr=1e-4
-PRETRAINED=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
+PRETRAINED=/nomic.modernbert-base.msmarco-passage.10k
 AGG=mean
 
 split=pos_half.neg_zero
@@ -63,8 +63,8 @@ srun singularity exec $SIF \
     --output_dir ${model_dir} \
     --model_name_or_path $PRETRAINED \
     --save_steps 5000 \
-    --dataset_name DylanJHJ/crux-researchy-new \
-    --corpus_name DylanJHJ/crux-researchy-corpus \
+    --dataset_name /crux-researchy-new \
+    --corpus_name /crux-researchy-corpus \
     --dataset_split $split \
     --per_device_train_batch_size 16 \
     --train_group_size 8 \

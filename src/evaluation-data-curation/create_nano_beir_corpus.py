@@ -46,4 +46,4 @@ for split in split_names:
 
 ## Transform to dataset
 dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
-dataset.push_to_hub("DylanJHJ/nano-beir-corpus")
+dataset.push_to_hub("/nano-beir-corpus")

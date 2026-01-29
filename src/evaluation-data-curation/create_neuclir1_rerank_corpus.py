@@ -40,4 +40,4 @@ for docid in document:
 
 ## Transform to dataset
 dataset = Dataset.from_list(dataset)
-dataset.push_to_hub("DylanJHJ/neuclir1-subset-corpus")
+dataset.push_to_hub("/neuclir1-subset-corpus")

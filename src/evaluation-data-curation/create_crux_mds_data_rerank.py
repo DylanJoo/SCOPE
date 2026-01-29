@@ -11,7 +11,7 @@ split_names = [
     "multi_news",
 ]
 
-ds_dict = load_dataset('DylanJHJ/crux-mds-corpus')
+ds_dict = load_dataset('/crux-mds-corpus')
 document = {}
 for ds_split in ds_dict:
     for example in ds_dict[ds_split]:
@@ -36,4 +36,4 @@ for split in split_names:
 
 ## Transform to dataset
 dataset = DatasetDict( {key: Dataset.from_list(dataset_dict[key]) for key in dataset_dict})
-dataset.push_to_hub("DylanJHJ/valid-crux-mds")
+dataset.push_to_hub("/valid-crux-mds")
