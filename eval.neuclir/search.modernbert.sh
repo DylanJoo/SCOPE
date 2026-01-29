@@ -9,7 +9,6 @@
 #SBATCH --time=00:30:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux

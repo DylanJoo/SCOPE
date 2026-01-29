@@ -10,11 +10,9 @@
 #SBATCH --time=1-00:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 model_dir=nomic-ai/modernbert-embed-base-unsupervised
-model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
 model_dir=${HOME}/models/ablation.two-stage/modernbert-two-stage-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.msmarco
 model_dir=${HOME}/models/ablation.cov-samping/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4
 output_dir=${HOME}/indices/neuclir1/${model_dir##*/}

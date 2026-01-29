@@ -10,11 +10,8 @@
 #SBATCH --time=00:30:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference
 
-# model_dir=DylanJHJ/nomic.modernbert-base.msmarco-passage.10k
-# model_dir=DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k
 # model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4
 # model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4 # 2
 # model_dir=${HOME}/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4 # 3

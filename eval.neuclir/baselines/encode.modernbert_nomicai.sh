@@ -10,7 +10,6 @@
 #SBATCH --time=1-00:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 model_dir=nomic-ai/modernbert-embed-base

@@ -10,18 +10,16 @@
 #SBATCH --time=12:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
-CRUX_ROOT=/home/dju/datasets/crux
+CRUX_ROOT=/home//datasets/crux
 
-# model_dir=DylanJHJ/dpr.modernbert-base.msmarco-passage.25k
-model_dir=/home/dju/models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512.self-prefinetuned
+model_dir=/home//models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512.self-prefinetuned
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
 for subset in crux-mds-duc04 crux-mds-multi_news;do
-    topic_path=/home/dju/SCOPE/src/mqr/${subset}.subquestions.jsonl
+    topic_path=/home//SCOPE/src/mqr/${subset}.subquestions.jsonl
     python -m tevatron.retriever.driver.encode \
       --output_dir=temp \
       --tokenizer_name answerdotai/ModernBERT-base \

@@ -9,13 +9,12 @@
 #SBATCH --time=00:30:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux
 
 model_dir=nomic-ai/modernbert-embed-base-unsupervised
-model_dir=DylanJHJ/repllama-3.1-8b.msmarco-passage.4k
+model_dir=/repllama-3.1-8b.msmarco-passage.4k
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
 

@@ -11,10 +11,9 @@
 #SBATCH --time=12:00:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh # ilps
 conda activate inference 
 
-model_dir=DylanJHJ/nomic.modernbert-base.crux-researchy-flatten.10k
+model_dir=/nomic.modernbert-base.crux-researchy-flatten.10k
 corpus_name=beir-corpus
 output_dir=${HOME}/indices/${corpus_name}/${model_dir##*/}
 mkdir -p $output_dir
@@ -46,7 +45,7 @@ for SHARD_ID in 0 1;do
         --passage_max_len 512 \
         --bf16 --pooling mean --normalize  \
         --passage_prefix "search_document: " \
-        --dataset_name DylanJHJ/${corpus_name} \
+        --dataset_name /${corpus_name} \
         --dataset_split $DATASET \
         --encode_output_path $output_dir/corpus_emb.${DATASET}-${SHARD_ID}.pkl \
         --dataset_shard_index ${SHARD_ID} \
@@ -61,7 +60,7 @@ python -m tevatron.retriever.driver.encode \
     --pooling mean --normalize --bf16 \
     --query_prefix "search_query: " \
     --per_device_eval_batch_size 128 \
-    --dataset_name  DylanJHJ/beir-subset \
+    --dataset_name  /beir-subset \
     --dataset_split $DATASET \
     --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
     --query_max_len 256 \

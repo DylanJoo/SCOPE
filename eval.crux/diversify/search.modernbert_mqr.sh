@@ -9,26 +9,21 @@
 #SBATCH --time=00:30:00
 
 # ENV
-source /ivi/ilps/personal/dju/miniconda3/etc/profile.d/conda.sh
 conda activate inference
 
 CRUX_ROOT=${HOME}/datasets/crux
 
-model_dir=DylanJHJ/dpr.modernbert-base.msmarco-passage.25k
-# model_dir=DylanJHJ/dpr.modernbert-base.crux-researchy-flatten.25k
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4.512
-
-# model_dir=/home/dju/models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512.self-prefinetuned
-# model_dir=/home/dju/models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512
-
-# model_dir=/home/dju/models/ablation.transfer-learning/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
-# model_dir=/home/dju/models/ablation.transfer-learning/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_20.neg_51.filtered.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_half.neg_zero.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_low.neg_zero.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_low.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_high.neg_quarter.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.cov-sampling/modernbert-crux-researchy-pos_zero.neg_high.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512.self-prefinetuned
+# model_dir=/home/models/ablation.transfer-learning/modernbert-two-stage.pos_20.neg_51.filtered.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.transfer-learning/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512
+# model_dir=/home/models/ablation.transfer-learning/modernbert-mixed-dataset.crux-researchy-pos_high.neg_zero.b64_n512.1e-4.512.35k
 
 output_dir=${HOME}/indices/crux-mds-corpus/${model_dir##*/}
 mkdir -p $output_dir
