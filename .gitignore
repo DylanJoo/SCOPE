@@ -16,3 +16,5 @@ eval*/**/result*
 runs
 
 src/data
+
+**/**/wandb/

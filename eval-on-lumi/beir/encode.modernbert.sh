@@ -7,65 +7,65 @@
 #SBATCH --nodes=1                   # Total number of nodes 
 #SBATCH --cpus-per-task=16
 #SBATCH --gpus-per-node=1           # Allocate one gpu per MPI rank
-#SBATCH --array=0-12%13
+#SBATCH --array=0-12
 #SBATCH --mem=64G
 #SBATCH --time=01:00:00           # Run time (d-hh:mm:ss)
-#SBATCH --account=project_465002438 # Project for billing
+#SBATCH --account=project_465002532 # Project for billing
 
 # ENV
 module use /appl/local/csc/modulefiles/
 module use /appl/local/training/modules/AI-20241126/
 
 DATASETS=(
-"beir.arguana"
+# "beir.arguana"
 "beir.climate_fever"
-"beir.dbpedia_entity"
+# "beir.dbpedia_entity"
 "beir.fever"
-"beir.fiqa"
-"beir.hotpotqa"
-"beir.nfcorpus"
-"beir.nq"
-"beir.quora"
-"beir.scidocs"
-"beir.scifact"
+# "beir.fiqa"
+# "beir.hotpotqa"
+# "beir.nfcorpus"
+# "beir.nq"
+# "beir.quora"
+# "beir.scidocs"
+# "beir.scifact"
 "beir.trec_covid"
 "beir.webis_touche2020"
 )
 DATASET=${DATASETS[$SLURM_ARRAY_TASK_ID]}
 
-for model_dir in DylanJHJ/nomic.modernbert-base.msmarco-passage.10k;do
-output_dir=${HOME}/indices/beir-subset-corpus/${model_dir##*/}
-# model_dir=$model_dir/checkpoint-5000
+model_dir=nomic-ai/modernbert-embed-base-unsupervised
+output_dir=${HOME}/indices/beir-corpus/${model_dir##*/}
 mkdir -p $output_dir
 
-echo Encoding $DATASET corpus
-singularity exec $SIF  \
+for SHARD_ID in 0 1;do
+    echo Encoding $DATASET corpus $SHARD_ID
+    singularity exec $SIF  \
     python -m tevatron.retriever.driver.encode \
-    --output_dir=temp \
-    --tokenizer_name answerdotai/ModernBERT-base \
-    --model_name_or_path $model_dir \
-    --per_device_eval_batch_size 2048 \
-    --passage_max_len 512 \
-    --exclude_title \
-    --pooling mean --normalize \
-    --passage_prefix "search_document: " \
-    --dataset_name DylanJHJ/beir-subset-corpus \
-    --dataset_split $DATASET \
-    --encode_output_path $output_dir/corpus_emb.${DATASET}.pkl
+        --output_dir=temp \
+        --tokenizer_name answerdotai/ModernBERT-base \
+        --model_name_or_path $model_dir \
+        --per_device_eval_batch_size 3840 \
+        --pooling mean --bf16 --normalize \
+        --passage_max_len 512 \
+        --passage_prefix "search_document: " \
+        --dataset_name DylanJHJ/beir-corpus \
+        --dataset_split $DATASET \
+        --encode_output_path $output_dir/corpus_emb.${DATASET}-${SHARD_ID}.pkl \
+        --dataset_shard_index ${SHARD_ID} \
+        --dataset_number_of_shards 2
+done
 
 echo Encoding $DATASET queries
 singularity exec $SIF  \
-    python -m tevatron.retriever.driver.encode \
+python -m tevatron.retriever.driver.encode \
     --output_dir=temp \
     --tokenizer_name answerdotai/ModernBERT-base \
     --model_name_or_path $model_dir \
-    --pooling mean --normalize \
     --per_device_eval_batch_size 128 \
+    --pooling mean --bf16 --normalize \
+    --query_prefix "search_query: " \
     --dataset_name  DylanJHJ/beir-subset \
     --dataset_split $DATASET \
-    --query_prefix "search_query: " \
     --encode_output_path $output_dir/query_emb.${DATASET}.pkl \
-    --query_max_len 256 \
+    --query_max_len 128 \
     --encode_is_query
-
-done
